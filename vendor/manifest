@@ -1,0 +1,56 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/cloudfoundry-incubator/candiedyaml",
+			"repository": "https://github.com/cloudfoundry-incubator/candiedyaml",
+			"vcs": "git",
+			"revision": "99c3df83b51532e3615f851d8c2dbb638f5313bf",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/davecgh/go-spew/spew",
+			"repository": "https://github.com/davecgh/go-spew",
+			"vcs": "git",
+			"revision": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d",
+			"branch": "master",
+			"path": "/spew",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/jessevdk/go-flags",
+			"repository": "https://github.com/jessevdk/go-flags",
+			"vcs": "git",
+			"revision": "6b9493b3cb60367edd942144879646604089e3f7",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/pmezard/go-difflib/difflib",
+			"repository": "https://github.com/pmezard/go-difflib",
+			"vcs": "git",
+			"revision": "792786c7400a136282c1664665ae0a8db921c6c2",
+			"branch": "master",
+			"path": "/difflib",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/ryanuber/go-license",
+			"repository": "https://github.com/ryanuber/go-license",
+			"vcs": "git",
+			"revision": "15e5a5ea39efceff3870dd96fe0f1769ac01f2f9",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/stretchr/testify/assert",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "6cb3b85ef5a0efef77caef88363ec4d4b5c0976d",
+			"branch": "master",
+			"path": "/assert",
+			"notests": true
+		}
+	]
+}

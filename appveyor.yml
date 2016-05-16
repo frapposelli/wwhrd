@@ -1,0 +1,57 @@
+version: "0.1.{build}"
+
+# Operating system (build VM template)
+os: Windows Server 2012 R2
+
+clone_folder: C:\gopath\src\github.com\frapposelli\wwhrd
+shallow_clone: true # for startup speed
+pull_requests:
+  do_not_increment_build_number: true
+
+
+environment:
+  GOPATH: C:\gopath
+  GO15VENDOREXPERIMENT: 1
+  GOCOVMODE: "mode: count"
+  PATH: C:\gopath\bin;%PATH%
+
+platform:
+  - x64
+
+# http://www.appveyor.com/docs/installed-software
+install:
+  # pre-installed MinGW at C:\MinGW is 32bit only
+  # but MSYS2 at C:\msys64 has mingw64
+  - set PATH=C:\msys64\mingw64\bin;%PATH%
+  - gcc --version
+  - g++ --version
+
+  # need bzr for several tests
+  # - choco install -y --force bzr jq unzip
+  # - ps: set latestv ((curl -Uri https://api.github.com/repos/Masterminds/glide/releases/latest).Content | jq -r .tag_name)
+  # - ps: curl -Uri "https://github.com/Masterminds/glide/releases/download/$latestv/glide-$latestv-windows-amd64.zip" -OutFile C:\glide.zip
+  # - unzip -j -d C:\glide C:\glide.zip
+  # - set PATH=C:\Program Files (x86)\Bazaar;C:\glide;%PATH%
+  - choco install -y --force bzr
+  - set PATH=C:\Program Files (x86)\Bazaar;%PATH%
+  - bzr --version
+
+
+  # get the dependencies etc
+  - go get -t -v ./...
+
+  # some helpful output for debugging builds
+  - go version
+  - go env
+
+build_script:
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - echo %PATH%
+  - echo %GOPATH%
+
+test_script:
+  - ps: go test -v $(go list ./... | sls -n vendor)
+
+#artifacts:
+#  - path: '%GOPATH%\bin\*.exe'
+deploy: off
