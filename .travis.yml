@@ -1,0 +1,16 @@
+language: go
+
+os:
+  - linux
+
+go:
+  - 1.6
+  - 1.7
+
+script:
+  - hack/coverage
+  - go get -u github.com/frapposelli/wwhrd
+  - wwhrd check
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -f .cover/cover.out
