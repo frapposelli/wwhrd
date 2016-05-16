@@ -1,0 +1,22 @@
+language: go
+
+os:
+  - linux
+  - osx
+
+go:
+  - 1.6
+  - 1.7
+  - 1.8
+  - tip
+
+install:
+  - echo "Skipping the default go get..."
+
+script:
+  - hack/coverage
+  - go install -v github.com/frapposelli/wwhrd
+  - wwhrd check
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -f .cover/cover.out

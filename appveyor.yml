@@ -1,0 +1,32 @@
+version: "{build}"
+
+# Source Config
+clone_folder: C:\gopath\src\github.com\frapposelli\wwhrd
+
+# Build host
+
+environment:
+  GOPATH: c:\gopath
+  GOVERSION: 1.8
+
+init:
+  - git config --global core.autocrlf input
+
+# Build
+
+install:
+  # Install the specific Go version.
+  - rmdir c:\go /s /q
+  - appveyor DownloadFile https://storage.googleapis.com/golang/go%GOVERSION%.windows-amd64.msi
+  - msiexec /i go%GOVERSION%.windows-amd64.msi /q
+  - set Path=c:\go\bin;c:\gopath\bin
+  - go version
+  - go env
+
+build: false
+deploy: false
+
+test_script:
+  - go test -v .
+  - go build github.com/frapposelli/wwhrd
+  - wwhrd check
