@@ -5,7 +5,8 @@ blacklist:
 whitelist:
   - Apache-2.0
   - MIT
+  - NewBSD
+  - FreeBSD
 
 exceptions:
-  - github.com/jessevdk/go-flags
-  - github.com/pmezard/go-difflib/difflib
+  - gopkg.in/yaml.v2
