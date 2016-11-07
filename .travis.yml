@@ -2,15 +2,10 @@ language: go
 
 os:
   - linux
-  - osx
-
-env:
-- GO15VENDOREXPERIMENT=1
 
 go:
-  - 1.5
   - 1.6
-  - tip
+  - 1.7
 
 script:
   - hack/coverage

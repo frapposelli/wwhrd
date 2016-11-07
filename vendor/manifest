@@ -2,6 +2,32 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/FiloSottile/gvt/fileutils",
+			"repository": "https://github.com/FiloSottile/gvt",
+			"vcs": "git",
+			"revision": "1f87bb350317842680fd7e0fdec64b4e14c79576",
+			"branch": "master",
+			"path": "fileutils",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/FiloSottile/gvt/gbvendor",
+			"repository": "https://github.com/FiloSottile/gvt",
+			"vcs": "git",
+			"revision": "1f87bb350317842680fd7e0fdec64b4e14c79576",
+			"branch": "master",
+			"path": "/gbvendor",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/Jeffail/gabs",
+			"repository": "https://github.com/Jeffail/gabs",
+			"vcs": "git",
+			"revision": "855034b6b7a3b7144977efcaefe72d2c64b0d039",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/Sirupsen/logrus",
 			"repository": "https://github.com/Sirupsen/logrus",
 			"vcs": "git",

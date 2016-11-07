@@ -4,8 +4,15 @@ import (
 	"fmt"
 	"os"
 
+	manifest "github.com/FiloSottile/gvt/gbvendor"
 	log "github.com/Sirupsen/logrus"
 	"github.com/jessevdk/go-flags"
+
+	"strings"
+
+	"encoding/json"
+
+	yaml "github.com/cloudfoundry-incubator/candiedyaml"
 )
 
 type cliOpts struct {
@@ -15,13 +22,14 @@ type cliOpts struct {
 	Check `command:"check" alias:"chk" description:"Check licenses against config file"`
 }
 
-type List struct{}
+type List struct {
+	YAML     bool `long:"yaml" description:"outputs the licenses in yaml format"`
+	Versions bool `long:"versions" description:"outputs the git revisions in yaml format"`
+}
 
 type Check struct {
 	File string `short:"f" long:"file" description:"input file" default:".wwhrd.yml"`
 }
-
-type What struct{}
 
 func newCli() *flags.Parser {
 	var opts cliOpts
@@ -44,12 +52,75 @@ func (l *List) Execute(args []string) error {
 	}
 	lics := GetLicenses(root, pkgs)
 
-	for k, v := range lics {
-		log.WithFields(log.Fields{
-			"package": k,
-			"license": v.Type,
-		}).Info("Found License")
+	var j manifest.Manifest
 
+	if l.Versions {
+
+		f, err := os.Open("vendor/manifest")
+		if err != nil {
+			return err
+		}
+
+		d := json.NewDecoder(f)
+		err = d.Decode(&j)
+		if err != nil {
+			return err
+		}
+
+		f.Close()
+	}
+
+	for k, v := range lics {
+		if l.YAML {
+
+			// We rudely remove the first part of the package name, guessing that it's going to be the hostname
+			name := strings.SplitAfterN(k, "/", 2)
+
+			// Replace / and . with underscores in package name and lower the case
+			r := strings.NewReplacer("/", "_", ".", "_")
+			n := r.Replace(name[1])
+			n = strings.ToLower(n)
+
+			var ver string
+
+			if l.Versions {
+				d, err := j.GetDependencyForImportpath(k)
+				if err != nil {
+					ver = "git+unspecified"
+				} else {
+					ver = "git+" + d.Revision[:12]
+				}
+			} else {
+				ver = "latest"
+			}
+
+			// build OSSTP package name
+			p := "other:" + n + ":" + ver
+
+			// build maps to marshal yaml
+			y := make(map[string]map[string]string)
+			y[p] = make(map[string]string)
+
+			y[p]["name"] = fmt.Sprintf("%s", n)
+			y[p]["license"] = fmt.Sprintf("%s", v.Type)
+			y[p]["repository"] = fmt.Sprintf("%s", "Other")
+			y[p]["url"] = fmt.Sprintf("%s", "http://"+k)
+			y[p]["version"] = fmt.Sprintf("%s", ver)
+
+			o, err := yaml.Marshal(y)
+			if err != nil {
+				return err
+			}
+
+			// spit it out
+			fmt.Printf("%v", string(o))
+
+		} else {
+			log.WithFields(log.Fields{
+				"package": k,
+				"license": v.Type,
+			}).Info("Found License")
+		}
 	}
 
 	return nil
