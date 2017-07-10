@@ -41,6 +41,8 @@ func newCli() *flags.Parser {
 
 func (l *List) Execute(args []string) error {
 
+	log.SetFormatter(&log.TextFormatter{ForceColors: true})
+
 	root, err := os.Getwd()
 	if err != nil {
 		return err
@@ -148,6 +150,8 @@ func (l *List) Execute(args []string) error {
 }
 
 func (c *Check) Execute(args []string) error {
+
+	log.SetFormatter(&log.TextFormatter{ForceColors: true})
 
 	t, err := ReadConfig(c.File)
 	if err != nil {

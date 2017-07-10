@@ -24,11 +24,11 @@ func TestCliListSuccess(t *testing.T) {
 	}{
 		{
 			[]string{"list"},
-			"\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=github.com/fake/package\n",
+			"\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n",
 		},
 		{
 			[]string{"ls"},
-			"\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=github.com/fake/package\n",
+			"\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n",
 		},
 	}
 	for _, c := range cases {
@@ -61,17 +61,17 @@ func TestCliCheck(t *testing.T) {
 	}{
 		{
 			[]string{"check"},
-			"\x1b[34mINFO\x1b[0m[0000] Found Approved license                        \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=github.com/fake/package\n",
+			"\x1b[34mINFO\x1b[0m[0000] Found Approved license                        \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n",
 			nil,
 		},
 		{
 			[]string{"check", "-f", ".wwhrd-ex.yml"},
-			"\x1b[33mWARN\x1b[0m[0000] Found exceptioned package                     \x1b[33mlicense\x1b[0m=FreeBSD \x1b[33mpackage\x1b[0m=github.com/fake/package\n",
+			"\x1b[33mWARN\x1b[0m[0000] Found exceptioned package                     \x1b[33mlicense\x1b[0m=FreeBSD \x1b[33mpackage\x1b[0m=\"github.com/fake/package\"\n",
 			nil,
 		},
 		{
 			[]string{"check", "-f", ".wwhrd-bl.yml"},
-			"\x1b[31mERRO\x1b[0m[0000] Found Non-Approved license                    \x1b[31mlicense\x1b[0m=FreeBSD \x1b[31mpackage\x1b[0m=github.com/fake/package\n",
+			"\x1b[31mERRO\x1b[0m[0000] Found Non-Approved license                    \x1b[31mlicense\x1b[0m=FreeBSD \x1b[31mpackage\x1b[0m=\"github.com/fake/package\"\n",
 			fmt.Errorf("Non-Approved license found"),
 		},
 		{

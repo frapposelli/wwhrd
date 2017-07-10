@@ -27,6 +27,9 @@ names.
 `MIT`<br>
 The MIT license. ([text](fixtures/licenses/MIT))
 
+`ISC`<br>
+The ISC license. ([text](fixtures/licenses/ISC))
+
 `NewBSD`<br>
 The "new" or "revised" BSD license.
 ([text](fixtures/licenses/NewBSD))
@@ -48,6 +51,10 @@ The GNU General Public License v2.0
 `GPL-3.0`<br>
 The GNU General Public License v3.0
 ([text](fixtures/licenses/GPL-3.0))
+
+`AGPL-3.0`<br>
+The GNU Affero General Public License v3.0
+([text](fixtures/licenses/AGPL-3.0))
 
 `LGPL-2.1`<br>
 GNU Library or "Lesser" General Public License v2.1
