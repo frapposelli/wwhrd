@@ -2,12 +2,6 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "github.com/FiloSottile/gvt"
-  packages = ["fileutils","gbvendor"]
-  revision = "50d83ea21cb0405e81efd284951e111b3a68d701"
-
-[[projects]]
   name = "github.com/Sirupsen/logrus"
   packages = ["."]
   revision = "7f976d3a76720c4c27af2ba716b85d2e0a7e38b1"
@@ -58,6 +52,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "56e868131a15e13e8d6ccf22a50ac6fbbb07c6b22e5c19a1c91a549e3044b45a"
+  inputs-digest = "2bc1a421159678a534a028034ab71df99eb186f816d9c51af6e353989d424854"
   solver-name = "gps-cdcl"
   solver-version = 1
