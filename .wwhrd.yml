@@ -7,6 +7,8 @@ whitelist:
   - MIT
   - NewBSD
   - FreeBSD
+  - ISC
 
 exceptions:
-  - gopkg.in/yaml.v2
+  - github.com/davecgh/go-spew/spew
+  - github.com/davecgh/go-spew/spew/testdata

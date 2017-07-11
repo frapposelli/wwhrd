@@ -59,6 +59,32 @@ func GetLicenses(root string, list map[string]bool) map[string]*license.License 
 		if pkg.IsDir() {
 			l, err := license.NewFromDir(fpath)
 			if err != nil {
+				// the package might be nested inside a larger package, we try to find
+				// the license starting from the beginning of the path.
+				pak := strings.Split(k, "/")
+				var path string
+				for x, y := range pak {
+					if x < 1 {
+						path = filepath.Join(root, "vendor", y)
+					} else {
+						path = filepath.Join(path, y)
+					}
+					if l, err := license.NewFromDir(path); err != nil {
+						continue
+					} else {
+						// We found a license in the leftmost package, that's enough for now
+						lics[k] = l
+						break
+					}
+				}
+				if lics[k] == nil {
+					// if our search didn't bear any fruit, ¯\_(ツ)_/¯
+					lics[k] = &license.License{
+						Type: "unrecognized",
+						Text: "unrecognized license",
+						File: "",
+					}
+				}
 				continue
 			}
 			lics[k] = l

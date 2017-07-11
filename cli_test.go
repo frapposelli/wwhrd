@@ -20,15 +20,15 @@ func TestCliListSuccess(t *testing.T) {
 
 	cases := []struct {
 		inArgs     []string
-		outputWant string
+		outputWant []string
 	}{
 		{
 			[]string{"list"},
-			"\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n",
+			[]string{"\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n", "\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n"},
 		},
 		{
 			[]string{"ls"},
-			"\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n",
+			[]string{"\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n", "\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n\x1b[34mINFO\x1b[0m[0000] Found License                                 \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n"},
 		},
 	}
 	for _, c := range cases {
@@ -40,7 +40,7 @@ func TestCliListSuccess(t *testing.T) {
 		_, err = parser.ParseArgs(c.inArgs)
 		assert.NoError(t, err)
 
-		assert.Equal(t, c.outputWant, out.String())
+		assert.Contains(t, c.outputWant, out.String())
 		out.Reset()
 
 	}
@@ -56,33 +56,33 @@ func TestCliCheck(t *testing.T) {
 
 	cases := []struct {
 		inArgs     []string
-		outputWant string
-		err        error
+		outputWant []string
+		err        []error
 	}{
 		{
 			[]string{"check"},
-			"\x1b[34mINFO\x1b[0m[0000] Found Approved license                        \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n",
-			nil,
+			[]string{"\x1b[34mINFO\x1b[0m[0000] Found Approved license                        \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n\x1b[34mINFO\x1b[0m[0000] Found Approved license                        \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n", "\x1b[34mINFO\x1b[0m[0000] Found Approved license                        \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n\x1b[34mINFO\x1b[0m[0000] Found Approved license                        \x1b[34mlicense\x1b[0m=FreeBSD \x1b[34mpackage\x1b[0m=\"github.com/fake/package\"\n"},
+			[]error{nil},
 		},
 		{
 			[]string{"check", "-f", ".wwhrd-ex.yml"},
-			"\x1b[33mWARN\x1b[0m[0000] Found exceptioned package                     \x1b[33mlicense\x1b[0m=FreeBSD \x1b[33mpackage\x1b[0m=\"github.com/fake/package\"\n",
-			nil,
+			[]string{"\x1b[33mWARN\x1b[0m[0000] Found exceptioned package                     \x1b[33mlicense\x1b[0m=FreeBSD \x1b[33mpackage\x1b[0m=\"github.com/fake/package\"\n\x1b[33mWARN\x1b[0m[0000] Found exceptioned package                     \x1b[33mlicense\x1b[0m=FreeBSD \x1b[33mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n", "\x1b[33mWARN\x1b[0m[0000] Found exceptioned package                     \x1b[33mlicense\x1b[0m=FreeBSD \x1b[33mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n\x1b[33mWARN\x1b[0m[0000] Found exceptioned package                     \x1b[33mlicense\x1b[0m=FreeBSD \x1b[33mpackage\x1b[0m=\"github.com/fake/package\"\n"},
+			[]error{nil},
 		},
 		{
 			[]string{"check", "-f", ".wwhrd-bl.yml"},
-			"\x1b[31mERRO\x1b[0m[0000] Found Non-Approved license                    \x1b[31mlicense\x1b[0m=FreeBSD \x1b[31mpackage\x1b[0m=\"github.com/fake/package\"\n",
-			fmt.Errorf("Non-Approved license found"),
+			[]string{"\x1b[31mERRO\x1b[0m[0000] Found Non-Approved license                    \x1b[31mlicense\x1b[0m=FreeBSD \x1b[31mpackage\x1b[0m=\"github.com/fake/package\"\n\x1b[31mERRO\x1b[0m[0000] Found Non-Approved license                    \x1b[31mlicense\x1b[0m=FreeBSD \x1b[31mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n", "\x1b[31mERRO\x1b[0m[0000] Found Non-Approved license                    \x1b[31mlicense\x1b[0m=FreeBSD \x1b[31mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n\x1b[31mERRO\x1b[0m[0000] Found Non-Approved license                    \x1b[31mlicense\x1b[0m=FreeBSD \x1b[31mpackage\x1b[0m=\"github.com/fake/package\"\n"},
+			[]error{fmt.Errorf("Non-Approved license found")},
 		},
 		{
 			[]string{"check", "-f", "NONEXISTENT"},
-			"",
-			fmt.Errorf("Can't read config file: stat NONEXISTENT: no such file or directory"),
+			[]string{""},
+			[]error{fmt.Errorf("Can't read config file: stat NONEXISTENT: no such file or directory"), fmt.Errorf("Can't read config file: GetFileAttributesEx NONEXISTENT: The system cannot find the file specified.")},
 		},
 		{
 			[]string{"check", "-f", ".wwhrd-botched.yml"},
-			"",
-			fmt.Errorf("Can't read config file: Invalid timestamp: 'whitelist - THISMAKESNOSENSE' at line 1, column 0"),
+			[]string{""},
+			[]error{fmt.Errorf("Can't read config file: Invalid timestamp: 'whitelist - THISMAKESNOSENSE' at line 1, column 0")},
 		},
 	}
 	for _, c := range cases {
@@ -92,9 +92,9 @@ func TestCliCheck(t *testing.T) {
 		assert.NoError(t, err)
 
 		_, err = parser.ParseArgs(c.inArgs)
-		assert.Equal(t, c.err, err)
+		assert.Contains(t, c.err, err)
 
-		assert.Equal(t, c.outputWant, out.String())
+		assert.Contains(t, c.outputWant, out.String())
 		out.Reset()
 
 	}

@@ -13,15 +13,6 @@ import (
 
 func Test(t *testing.T) {
 	os.Args[1] = "-h"
-
-	// tArgs := []string{
-	// 	"-h",
-	// }
-	// parser := newCli()
-	// _, err := parser.ParseArgs(tArgs)
-	// // assert.NoError(t, err)
-	// assert.Error(t, err)
-
 }
 
 func mockGoPackageDir(t *testing.T, prefix string) (dir string, rm func()) {
@@ -32,6 +23,10 @@ func mockGoPackageDir(t *testing.T, prefix string) (dir string, rm func()) {
 	}
 
 	if err := os.MkdirAll(filepath.Join(dir, "vendor/github.com/fake/package"), 0755); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := os.MkdirAll(filepath.Join(dir, "vendor/github.com/fake/nested/inside/a/package"), 0755); err != nil {
 		log.Fatal(err)
 	}
 
@@ -46,6 +41,8 @@ func mockGoPackageDir(t *testing.T, prefix string) (dir string, rm func()) {
 		{".wwhrd-botched.yml", []byte(mockConfBotched)},
 		{filepath.Join("vendor/github.com/fake/package", "mockpkg.go"), []byte(mockVendor)},
 		{filepath.Join("vendor/github.com/fake/package", "LICENSE"), []byte(mockLicense)},
+		{filepath.Join("vendor/github.com/fake/nested", "LICENSE"), []byte(mockLicense)},
+		{filepath.Join("vendor/github.com/fake/nested/inside/a/package", "mockpkg.go"), []byte(mockVendor)},
 	}
 
 	for _, c := range files {
@@ -98,6 +95,7 @@ blacklist:
 var mockConfEX = `---
 exceptions:
   - github.com/fake/package
+  - github.com/fake/nested/inside/a/package
 `
 var mockConfBotched = `---
 whitelist
@@ -105,7 +103,10 @@ whitelist
 `
 
 var mockGo = `package main
-import "github.com/fake/package"
+import (
+	"github.com/fake/package"
+	"github.com/fake/nested/inside/a/package"
+)
 func main() {}
 `
 

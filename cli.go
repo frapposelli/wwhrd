@@ -4,27 +4,16 @@ import (
 	"fmt"
 	"os"
 
-	manifest "github.com/FiloSottile/gvt/gbvendor"
 	log "github.com/Sirupsen/logrus"
 	"github.com/jessevdk/go-flags"
-
-	"strings"
-
-	"encoding/json"
-
-	yaml "github.com/cloudfoundry-incubator/candiedyaml"
 )
 
 type cliOpts struct {
-	// Slice of bool will append 'true' each time the option
-	// is encountered (can be set multiple times, like -vvv)
 	List  `command:"list" alias:"ls" description:"List licenses"`
 	Check `command:"check" alias:"chk" description:"Check licenses against config file"`
 }
 
 type List struct {
-	YAML     bool `long:"yaml" description:"outputs the licenses in yaml format"`
-	Versions bool `long:"versions" description:"outputs the git revisions in yaml format"`
 }
 
 type Check struct {
@@ -54,96 +43,12 @@ func (l *List) Execute(args []string) error {
 	}
 	lics := GetLicenses(root, pkgs)
 
-	var j manifest.Manifest
-
-	if l.Versions {
-
-		f, err := os.Open("vendor/manifest")
-		if err != nil {
-			return err
-		}
-
-		d := json.NewDecoder(f)
-		err = d.Decode(&j)
-		if err != nil {
-			return err
-		}
-
-		f.Close()
-	}
-
 	for k, v := range lics {
-		if l.YAML {
 
-			// We rudely remove the first part of the package name, guessing that it's going to be the hostname
-			name := strings.SplitAfterN(k, "/", 2)
-
-			// Replace / and . with underscores in package name and lower the case
-			r := strings.NewReplacer("/", "_", ".", "_")
-			n := r.Replace(name[1])
-			n = strings.ToLower(n)
-
-			var ver string
-
-			if l.Versions {
-				d, err := j.GetDependencyForImportpath(k)
-				if err != nil {
-					ver = "master"
-				} else {
-					ver = d.Revision
-				}
-			} else {
-				ver = "master"
-			}
-
-			// build OSSTP package name
-			p := "other:" + n + ":" + ver
-
-			// build maps to marshal yaml
-			y := make(map[string]map[string]string)
-			y[p] = make(map[string]string)
-
-			y[p]["name"] = fmt.Sprintf("%s", n)
-			y[p]["license"] = fmt.Sprintf("%s", v.Type)
-			y[p]["repository"] = fmt.Sprintf("%s", "Other")
-			switch {
-			// if the package comes from github, we know how to fetch the zip bundle
-			case strings.HasPrefix(k, "github.com"):
-				y[p]["url"] = fmt.Sprintf("%s", "https://codeload."+k+"/zip/"+ver)
-			case strings.HasPrefix(k, "gopkg.in"):
-
-				if strings.ContainsAny(name[1], "/") {
-					gopkg := strings.Split(name[1], ".")
-					y[p]["url"] = fmt.Sprintf("%s", "https://codeload.github.com/"+gopkg[0]+"/zip/"+ver)
-				} else {
-					gopkg := strings.Split(name[1], ".")
-					y[p]["url"] = fmt.Sprintf("%s", "https://codeload.github.com/go-"+gopkg[0]+"/"+gopkg[0]+"/zip/"+ver)
-				}
-
-			case strings.HasPrefix(k, "golang.org"):
-				gopkg := strings.Split(name[1], "/")
-				y[p]["url"] = fmt.Sprintf("%s", "https://codeload.github.com/golang/"+gopkg[1]+"/zip/"+ver)
-			// otherwise, we try our best to see if the package is available on github
-			default:
-				y[p]["url"] = fmt.Sprintf("%s", "https://codeload.github.com/"+name[1]+"/zip/"+ver)
-			}
-
-			y[p]["version"] = fmt.Sprintf("%s", ver)
-
-			o, err := yaml.Marshal(y)
-			if err != nil {
-				return err
-			}
-
-			// spit it out
-			fmt.Printf("%v", string(o))
-
-		} else {
-			log.WithFields(log.Fields{
-				"package": k,
-				"license": v.Type,
-			}).Info("Found License")
-		}
+		log.WithFields(log.Fields{
+			"package": k,
+			"license": v.Type,
+		}).Info("Found License")
 	}
 
 	return nil
@@ -176,13 +81,13 @@ func (c *Check) Execute(args []string) error {
 		blacklist[v] = true
 	}
 
-	// Make a map out of the blacklist
+	// Make a map out of the whitelist
 	whitelist := make(map[string]bool)
 	for _, v := range t.Whitelist {
 		whitelist[v] = true
 	}
 
-	// Make a map out of the blacklist
+	// Make a map out of the exceptions list
 	exceptions := make(map[string]bool)
 	for _, v := range t.Exceptions {
 		exceptions[v] = true

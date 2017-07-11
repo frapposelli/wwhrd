@@ -2,6 +2,7 @@ language: go
 
 os:
   - linux
+  - osx
 
 go:
   - 1.6
@@ -9,9 +10,12 @@ go:
   - 1.8
   - tip
 
+install:
+  - echo "Skipping the default go get..."
+
 script:
   - hack/coverage
-  - go get -u github.com/frapposelli/wwhrd
+  - go install -v github.com/frapposelli/wwhrd
   - wwhrd check
 
 after_success:

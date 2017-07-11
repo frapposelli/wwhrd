@@ -1,57 +1,32 @@
-version: "0.1.{build}"
+version: "{build}"
 
-# Operating system (build VM template)
-os: Windows Server 2012 R2
-
+# Source Config
 clone_folder: C:\gopath\src\github.com\frapposelli\wwhrd
-shallow_clone: true # for startup speed
-pull_requests:
-  do_not_increment_build_number: true
 
+# Build host
 
 environment:
-  GOPATH: C:\gopath
-  GO15VENDOREXPERIMENT: 1
-  GOCOVMODE: "mode: count"
-  PATH: C:\gopath\bin;%PATH%
+  GOPATH: c:\gopath
+  GOVERSION: 1.8
 
-platform:
-  - x64
+init:
+  - git config --global core.autocrlf input
 
-# http://www.appveyor.com/docs/installed-software
+# Build
+
 install:
-  # pre-installed MinGW at C:\MinGW is 32bit only
-  # but MSYS2 at C:\msys64 has mingw64
-  - set PATH=C:\msys64\mingw64\bin;%PATH%
-  - gcc --version
-  - g++ --version
-
-  # need bzr for several tests
-  # - choco install -y --force bzr jq unzip
-  # - ps: set latestv ((curl -Uri https://api.github.com/repos/Masterminds/glide/releases/latest).Content | jq -r .tag_name)
-  # - ps: curl -Uri "https://github.com/Masterminds/glide/releases/download/$latestv/glide-$latestv-windows-amd64.zip" -OutFile C:\glide.zip
-  # - unzip -j -d C:\glide C:\glide.zip
-  # - set PATH=C:\Program Files (x86)\Bazaar;C:\glide;%PATH%
-  - choco install -y --force bzr
-  - set PATH=C:\Program Files (x86)\Bazaar;%PATH%
-  - bzr --version
-
-
-  # get the dependencies etc
-  - go get -t -v ./...
-
-  # some helpful output for debugging builds
+  # Install the specific Go version.
+  - rmdir c:\go /s /q
+  - appveyor DownloadFile https://storage.googleapis.com/golang/go%GOVERSION%.windows-amd64.msi
+  - msiexec /i go%GOVERSION%.windows-amd64.msi /q
+  - set Path=c:\go\bin;c:\gopath\bin
   - go version
   - go env
 
-build_script:
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - echo %PATH%
-  - echo %GOPATH%
+build: false
+deploy: false
 
 test_script:
-  - ps: go test -v $(go list ./... | sls -n vendor)
-
-#artifacts:
-#  - path: '%GOPATH%\bin\*.exe'
-deploy: off
+  - go test -v .
+  - go build github.com/frapposelli/wwhrd
+  - wwhrd check
