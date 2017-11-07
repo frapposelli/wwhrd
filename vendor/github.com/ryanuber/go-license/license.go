@@ -167,6 +167,10 @@ func (l *License) GuessType() error {
 		"software for any"):
 		l.Type = LicenseISC
 
+	case scan(comp, "permission to use, copy, modify, and distribute this "+
+		"software for any"):
+		l.Type = LicenseISC
+
 	case scan(comp, "apache license version 2.0, january 2004") ||
 		scan(comp, "http://www.apache.org/licenses/license-2.0"):
 		l.Type = LicenseApache20
