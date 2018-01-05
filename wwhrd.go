@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/jessevdk/go-flags"
+	log "github.com/sirupsen/logrus"
 )
 
 // Initialize and run wwhrd
