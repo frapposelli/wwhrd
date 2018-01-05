@@ -11,10 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test(t *testing.T) {
-	os.Args[1] = "-h"
-}
-
 func mockGoPackageDir(t *testing.T, prefix string) (dir string, rm func()) {
 
 	dir, err := ioutil.TempDir("", prefix)

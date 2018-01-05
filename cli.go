@@ -94,23 +94,18 @@ func (c *Check) Execute(args []string) error {
 	}
 
 	for pkg, lic := range lics {
+		contextLogger := log.WithFields(log.Fields{
+			"package": pkg,
+			"license": lic.Type,
+		})
 
 		switch {
 		case whitelist[lic.Type] && !blacklist[lic.Type]:
-			log.WithFields(log.Fields{
-				"package": pkg,
-				"license": lic.Type,
-			}).Info("Found Approved license")
+			contextLogger.Info("Found Approved license")
 		case exceptions[pkg]:
-			log.WithFields(log.Fields{
-				"package": pkg,
-				"license": lic.Type,
-			}).Warn("Found exceptioned package")
+			contextLogger.Warn("Found exceptioned package")
 		default:
-			log.WithFields(log.Fields{
-				"package": pkg,
-				"license": lic.Type,
-			}).Error("Found Non-Approved license")
+			contextLogger.Error("Found Non-Approved license")
 			err = fmt.Errorf("Non-Approved license found")
 		}
 	}

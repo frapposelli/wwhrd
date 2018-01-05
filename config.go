@@ -19,14 +19,13 @@ func ReadConfig(path string) (*Config, error) {
 	}
 
 	f, err := os.Open(path)
-	defer f.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 
 	t := Config{}
-	err = yaml.NewDecoder(f).Decode(&t)
-	if err != nil {
+	if err = yaml.NewDecoder(f).Decode(&t); err != nil {
 		return nil, err
 	}
 
