@@ -9,8 +9,9 @@ import (
 )
 
 type cliOpts struct {
-	List  `command:"list" alias:"ls" description:"List licenses"`
-	Check `command:"check" alias:"chk" description:"Check licenses against config file"`
+	List        `command:"list" alias:"ls" description:"List licenses"`
+	Check       `command:"check" alias:"chk" description:"Check licenses against config file"`
+	VersionFlag func() error `long:"version" short:"v" description:"Show CLI version"`
 }
 
 type List struct {
@@ -20,8 +21,23 @@ type Check struct {
 	File string `short:"f" long:"file" description:"input file" default:".wwhrd.yml"`
 }
 
+const VersionHelp flags.ErrorType = 1961
+
+var (
+	version = "dev"
+	commit  = "1961213"
+	date    = "1961-02-13T20:06:35Z"
+)
+
 func newCli() *flags.Parser {
-	var opts cliOpts
+	opts := cliOpts{
+		VersionFlag: func() error {
+			return &flags.Error{
+				Type:    VersionHelp,
+				Message: fmt.Sprintf("version %s\ncommit %s\ndate %s\n", version, commit, date),
+			}
+		},
+	}
 	parser := flags.NewParser(&opts, flags.HelpFlag|flags.PassDoubleDash)
 	parser.LongDescription = "What would Henry Rollins do?"
 
