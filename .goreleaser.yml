@@ -15,3 +15,13 @@ archive:
   - README*
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
+dockers:
+  - image: frapposelli/wwhrd
+    goos: linux
+    goarch: amd64
+    binary: wwhrd
+    tag_templates:
+    - "{{ .Tag }}"
+    - "v{{ .Major }}"
+    - "v{{ .Major }}.{{ .Minor }}"
+    - latest

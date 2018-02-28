@@ -8,8 +8,10 @@ go:
   - 1.7.x
   - 1.8.x
   - 1.9.x
-  - 1.10.x
-  - tip
+  - '1.10'
+
+services:
+  - docker
 
 install:
   - echo "Skipping the default go get..."
@@ -21,6 +23,7 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -f .cover/cover.out
+  - test -n "$TRAVIS_TAG" && docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 
 deploy:
 - provider: script
@@ -29,3 +32,4 @@ deploy:
   on:
     tags: true
     condition: $TRAVIS_OS_NAME = linux
+    go: '1.10'
