@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/jessevdk/go-flags"
@@ -15,6 +16,8 @@ func main() {
 		if _, ok := err.(*flags.Error); ok {
 			typ := err.(*flags.Error).Type
 			switch {
+			case typ == VersionHelp:
+				fmt.Println(err.(*flags.Error).Message)
 			case typ == flags.ErrHelp:
 				parser.WriteHelp(os.Stdout)
 			case typ == flags.ErrCommandRequired && len(c[0]) == 0:
