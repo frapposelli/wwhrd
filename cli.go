@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
@@ -110,25 +111,49 @@ func (c *Check) Execute(args []string) error {
 
 	// Make a map out of the exceptions list
 	exceptions := make(map[string]bool)
+	exceptionsWildcard := make(map[string]bool)
 	for _, v := range t.Exceptions {
-		exceptions[v] = true
+		if strings.HasSuffix(v, "/...") {
+			exceptionsWildcard[strings.TrimRight(v, "/...")] = true
+		} else {
+			exceptions[v] = true
+		}
 	}
 
+PackageList:
 	for pkg, lic := range lics {
 		contextLogger := log.WithFields(log.Fields{
 			"package": pkg,
 			"license": lic.Type,
 		})
 
-		switch {
-		case whitelist[lic.Type] && !blacklist[lic.Type]:
+		// License is whitelisted and not specified in blacklist
+		if whitelist[lic.Type] && !blacklist[lic.Type] {
 			contextLogger.Info("Found Approved license")
-		case exceptions[pkg]:
-			contextLogger.Warn("Found exceptioned package")
-		default:
-			contextLogger.Error("Found Non-Approved license")
-			err = fmt.Errorf("Non-Approved license found")
+			continue PackageList
 		}
+
+		// if we have exceptions wildcards, let's run through them
+		if len(exceptionsWildcard) > 0 {
+			for wc, _ := range exceptionsWildcard {
+				if strings.HasPrefix(pkg, wc) {
+					// we have a match
+					contextLogger.Warn("Found exceptioned package")
+					continue PackageList
+				}
+			}
+		}
+
+		// match single-package exceptions
+		if _, exists := exceptions[pkg]; exists {
+			contextLogger.Warn("Found exceptioned package")
+			continue PackageList
+		}
+
+		// no matches, it's a non-approved license
+		contextLogger.Error("Found Non-Approved license")
+		err = fmt.Errorf("Non-Approved license found")
+
 	}
 
 	return err

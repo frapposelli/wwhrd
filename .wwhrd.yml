@@ -10,5 +10,4 @@ whitelist:
   - ISC
 
 exceptions:
-  - github.com/davecgh/go-spew/spew
-  - github.com/davecgh/go-spew/spew/testdata
+  - github.com/davecgh/go-spew/spew/...

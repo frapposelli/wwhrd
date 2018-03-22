@@ -70,6 +70,11 @@ func TestCliCheck(t *testing.T) {
 			[]error{nil},
 		},
 		{
+			[]string{"check", "-f", ".wwhrd-exwc.yml"},
+			[]string{"\x1b[33mWARN\x1b[0m[0000] Found exceptioned package                     \x1b[33mlicense\x1b[0m=FreeBSD \x1b[33mpackage\x1b[0m=\"github.com/fake/package\"\n\x1b[33mWARN\x1b[0m[0000] Found exceptioned package                     \x1b[33mlicense\x1b[0m=FreeBSD \x1b[33mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n", "\x1b[33mWARN\x1b[0m[0000] Found exceptioned package                     \x1b[33mlicense\x1b[0m=FreeBSD \x1b[33mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n\x1b[33mWARN\x1b[0m[0000] Found exceptioned package                     \x1b[33mlicense\x1b[0m=FreeBSD \x1b[33mpackage\x1b[0m=\"github.com/fake/package\"\n"},
+			[]error{nil},
+		},
+		{
 			[]string{"check", "-f", ".wwhrd-bl.yml"},
 			[]string{"\x1b[31mERRO\x1b[0m[0000] Found Non-Approved license                    \x1b[31mlicense\x1b[0m=FreeBSD \x1b[31mpackage\x1b[0m=\"github.com/fake/package\"\n\x1b[31mERRO\x1b[0m[0000] Found Non-Approved license                    \x1b[31mlicense\x1b[0m=FreeBSD \x1b[31mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n", "\x1b[31mERRO\x1b[0m[0000] Found Non-Approved license                    \x1b[31mlicense\x1b[0m=FreeBSD \x1b[31mpackage\x1b[0m=\"github.com/fake/nested/inside/a/package\"\n\x1b[31mERRO\x1b[0m[0000] Found Non-Approved license                    \x1b[31mlicense\x1b[0m=FreeBSD \x1b[31mpackage\x1b[0m=\"github.com/fake/package\"\n"},
 			[]error{fmt.Errorf("Non-Approved license found")},
