@@ -34,6 +34,15 @@ exceptions:
 
 Having a license in the `blacklist` section will fail the check, unless the package is listed under `exceptions`.
 
+`exceptions` can also be listed as wildcards:
+
+```yaml
+exceptions:
+  - github.com/davecgh/go-spew/spew/...
+```
+
+Will make a blanket exception for all the packages under `github.com/davecgh/go-spew/spew`.
+
 Use it in your CI!
 
 ```console
