@@ -60,11 +60,16 @@ func (l *List) Execute(args []string) error {
 	lics := GetLicenses(root, pkgs)
 
 	for k, v := range lics {
-
-		log.WithFields(log.Fields{
-			"package": k,
-			"license": v.Type,
-		}).Info("Found License")
+		if v.Recognized() {
+			log.WithFields(log.Fields{
+				"package": k,
+				"license": v.Type,
+			}).Info("Found License")
+		} else {
+			log.WithFields(log.Fields{
+				"package": k,
+			}).Warning("Did not find recognized license!")
+		}
 	}
 
 	return nil
