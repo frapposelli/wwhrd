@@ -32,6 +32,11 @@ var (
 	date    = "1961-02-13T20:06:35Z"
 )
 
+func setQuiet() error {
+	log.SetLevel(log.WarnLevel)
+	return nil
+}
+
 func newCli() *flags.Parser {
 	opts := cliOpts{
 		VersionFlag: func() error {
@@ -40,10 +45,7 @@ func newCli() *flags.Parser {
 				Message: fmt.Sprintf("version %s\ncommit %s\ndate %s\n", version, commit, date),
 			}
 		},
-		Quiet: func() error {
-			log.SetLevel(log.WarnLevel)
-			return nil
-		},
+		Quiet: setQuiet,
 	}
 	parser := flags.NewParser(&opts, flags.HelpFlag|flags.PassDoubleDash)
 	parser.LongDescription = "What would Henry Rollins do?"

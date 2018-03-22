@@ -46,6 +46,17 @@ func TestCliListSuccess(t *testing.T) {
 	}
 }
 
+func TestCliQuiet(t *testing.T) {
+	initial := log.GetLevel()
+	defer log.SetLevel(initial)
+
+	err := setQuiet()
+	assert.NoError(t, err)
+
+	after := log.GetLevel()
+	assert.Equal(t, log.WarnLevel, after)
+}
+
 func TestCliCheck(t *testing.T) {
 	parser := newCli()
 	var out = &bytes.Buffer{}
