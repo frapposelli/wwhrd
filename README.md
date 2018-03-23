@@ -12,6 +12,12 @@ Please note that `wwhrd` **only checks** packages stored under `vendor/`.
 $ go get -u github.com/frapposelli/wwhrd
 ```
 
+Using [Brew](https://brew.sh) on macOS:
+
+```console
+$ brew install frapposelli/tap/wwhrd
+```
+
 ## Configuration file
 
 Configuration for `wwhrd` is stored in `.wwhrd.yml` at the root of the repo you want to check.
