@@ -10,8 +10,8 @@ import (
 )
 
 type cliOpts struct {
-	List        `command:"list" alias:"ls" description:"List licenses"`
-	Check       `command:"check" alias:"chk" description:"Check licenses against config file"`
+	List                     `command:"list" alias:"ls" description:"List licenses"`
+	Check                    `command:"check" alias:"chk" description:"Check licenses against config file"`
 	VersionFlag func() error `long:"version" short:"v" description:"Show CLI version"`
 
 	Quiet func() error `short:"q" long:"quiet" description:"quiet mode, do not log accepted packages"`
@@ -57,7 +57,7 @@ func (l *List) Execute(args []string) error {
 
 	log.SetFormatter(&log.TextFormatter{ForceColors: true})
 
-	root, err := os.Getwd()
+	root, err := rootDir()
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func (c *Check) Execute(args []string) error {
 		return err
 	}
 
-	root, err := os.Getwd()
+	root, err := rootDir()
 	if err != nil {
 		return err
 	}
@@ -165,4 +165,23 @@ PackageList:
 	}
 
 	return err
+}
+
+func rootDir() (string, error) {
+	root, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	info, err := os.Lstat(root)
+	if err != nil {
+		return "", err
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		root, err = os.Readlink(root)
+		if err != nil {
+			return "", err
+		}
+	}
+	return root, nil
 }
