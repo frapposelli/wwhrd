@@ -54,7 +54,7 @@ func TestCliQuiet(t *testing.T) {
 	assert.NoError(t, err)
 
 	after := log.GetLevel()
-	assert.Equal(t, log.WarnLevel, after)
+	assert.Equal(t, log.ErrorLevel, after)
 }
 
 func TestCliCheck(t *testing.T) {
