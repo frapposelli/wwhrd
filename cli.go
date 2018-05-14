@@ -10,8 +10,8 @@ import (
 )
 
 type cliOpts struct {
-	List                     `command:"list" alias:"ls" description:"List licenses"`
-	Check                    `command:"check" alias:"chk" description:"Check licenses against config file"`
+	List        `command:"list" alias:"ls" description:"List licenses"`
+	Check       `command:"check" alias:"chk" description:"Check licenses against config file"`
 	VersionFlag func() error `long:"version" short:"v" description:"Show CLI version"`
 
 	Quiet func() error `short:"q" long:"quiet" description:"quiet mode, do not log accepted packages"`
@@ -33,7 +33,7 @@ var (
 )
 
 func setQuiet() error {
-	log.SetLevel(log.WarnLevel)
+	log.SetLevel(log.ErrorLevel)
 	return nil
 }
 
