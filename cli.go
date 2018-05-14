@@ -18,10 +18,12 @@ type cliOpts struct {
 }
 
 type List struct {
+	NoColor bool `long:"no-color" description:"disable colored output"`
 }
 
 type Check struct {
-	File string `short:"f" long:"file" description:"input file" default:".wwhrd.yml"`
+	File    string `short:"f" long:"file" description:"input file" default:".wwhrd.yml"`
+	NoColor bool   `long:"no-color" description:"disable colored output"`
 }
 
 const VersionHelp flags.ErrorType = 1961
@@ -55,7 +57,11 @@ func newCli() *flags.Parser {
 
 func (l *List) Execute(args []string) error {
 
-	log.SetFormatter(&log.TextFormatter{ForceColors: true})
+	if l.NoColor {
+		log.SetFormatter(&log.TextFormatter{DisableColors: true})
+	} else {
+		log.SetFormatter(&log.TextFormatter{ForceColors: true})
+	}
 
 	root, err := rootDir()
 	if err != nil {
@@ -86,7 +92,11 @@ func (l *List) Execute(args []string) error {
 
 func (c *Check) Execute(args []string) error {
 
-	log.SetFormatter(&log.TextFormatter{ForceColors: true})
+	if c.NoColor {
+		log.SetFormatter(&log.TextFormatter{DisableColors: true})
+	} else {
+		log.SetFormatter(&log.TextFormatter{ForceColors: true})
+	}
 
 	t, err := ReadConfig(c.File)
 	if err != nil {
