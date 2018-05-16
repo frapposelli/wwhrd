@@ -57,7 +57,6 @@ func newCli() *flags.Parser {
 
 func (l *List) Execute(args []string) error {
 
-	fmt.Println(l.NoColor)
 	if l.NoColor {
 		log.SetFormatter(&log.TextFormatter{DisableColors: true})
 	} else {
