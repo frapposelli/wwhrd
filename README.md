@@ -1,4 +1,4 @@
-# WWHRD? (What Would Henry Rollins Do?) [![Build Status](https://travis-ci.org/frapposelli/wwhrd.svg)](https://travis-ci.org/frapposelli/wwhrd) [![codecov](https://codecov.io/gh/frapposelli/wwhrd/branch/master/graph/badge.svg)](https://codecov.io/gh/frapposelli/wwhrd)
+# WWHRD? (What Would Henry Rollins Do?) [![CircleCI](https://circleci.com/gh/frapposelli/wwhrd/tree/master.svg?style=svg)](https://circleci.com/gh/frapposelli/wwhrd/tree/master) [![codecov](https://codecov.io/gh/frapposelli/wwhrd/branch/master/graph/badge.svg)](https://codecov.io/gh/frapposelli/wwhrd)
 
 ![WWHRD?](http://frapposelli.github.io/wwhrd/img/wwhrd.png)
 
