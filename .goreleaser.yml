@@ -18,15 +18,15 @@ archive:
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
 dockers:
-  - image: frapposelli/wwhrd
+  - image_templates: 
+    - "frapposelli/wwhrd:latest"
+    - "frapposelli/wwhrd:{{ .Tag }}"
+    - "frapposelli/wwhrd:v{{ .Major }}"
     goos: linux
     goarch: amd64
-    binary: wwhrd
-    tag_templates:
-    - "{{ .Tag }}"
-    - "v{{ .Major }}"
-    - "v{{ .Major }}.{{ .Minor }}"
-    - latest
+    binaries: 
+    - wwhrd
+    dockerfile: Dockerfile
 brew:
   github:
     owner: frapposelli
