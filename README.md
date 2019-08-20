@@ -4,18 +4,18 @@
 
 Have Henry Rollins check vendored licenses in your Go project.
 
-Please note that `wwhrd` **only checks** packages stored under `vendor/`.
+Please note that `wwhrd` **only checks** packages stored under `vendor/`, if you are using Go modules (`go mod`), you can add `go mod vendor` before running `wwhrd`, this will dump a copy of the vendored packages inside the local repo.
 
 ## Installation
 
 ```console
-$ go get -u github.com/frapposelli/wwhrd
+go get -u github.com/frapposelli/wwhrd
 ```
 
 Using [Brew](https://brew.sh) on macOS:
 
 ```console
-$ brew install frapposelli/tap/wwhrd
+brew install frapposelli/tap/wwhrd
 ```
 
 ## Configuration file
