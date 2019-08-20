@@ -8,10 +8,6 @@ shared: &shared
     - run: go install -v github.com/frapposelli/wwhrd
     - run: wwhrd check
 jobs:
-  "golang-1.7":  
-    <<: *shared
-    docker:
-      - image: circleci/golang:1.7
   "golang-1.8":
     <<: *shared
     docker:
@@ -28,9 +24,13 @@ jobs:
     <<: *shared
     docker:
       - image: circleci/golang:1.11
+  "golang-1.12":
+    <<: *shared
+    docker:
+      - image: circleci/golang:1.12
   release:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.12
     steps:
       - checkout
       - run: ./.circleci/docker-login.sh
@@ -39,11 +39,11 @@ workflows:
   version: 2
   build:
     jobs:
-      - "golang-1.7"
       - "golang-1.8"
       - "golang-1.9"
       - "golang-1.10"
       - "golang-1.11"
+      - "golang-1.12"
   release:
     jobs:
       - release:
