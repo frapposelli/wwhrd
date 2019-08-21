@@ -37,6 +37,7 @@ var (
 // license may be. Case does not matter.
 var DefaultLicenseFiles = []string{
 	"license", "license.txt", "license.md",
+	"licence", "licence.txt", "licence.md",
 	"copying", "copying.txt", "copying.md",
 	"unlicense",
 }
@@ -164,6 +165,10 @@ func (l *License) GuessType() error {
 		l.Type = LicenseMIT
 
 	case scan(comp, "permission to use, copy, modify, and/or distribute this "+
+		"software for any"):
+		l.Type = LicenseISC
+	// When originally released the license did not include the term "and/or", this was added by ISC in 2007
+	case scan(comp, "permission to use, copy, modify, and distribute this "+
 		"software for any"):
 		l.Type = LicenseISC
 
