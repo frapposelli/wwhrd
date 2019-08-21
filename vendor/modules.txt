@@ -1,0 +1,16 @@
+# github.com/cloudfoundry-incubator/candiedyaml v0.0.0-20170223024657-cff29b469e0f
+github.com/cloudfoundry-incubator/candiedyaml
+# github.com/davecgh/go-spew v1.1.0
+github.com/davecgh/go-spew/spew
+# github.com/jessevdk/go-flags v1.2.0
+github.com/jessevdk/go-flags
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/ryanuber/go-license v0.0.0-20180405065157-c69f41c2c8d6
+github.com/ryanuber/go-license
+# github.com/sirupsen/logrus v1.0.1
+github.com/sirupsen/logrus
+# github.com/stretchr/testify v1.1.4
+github.com/stretchr/testify/assert
+# golang.org/x/sys v0.0.0-20180909124046-d0be0721c37e
+golang.org/x/sys/unix
