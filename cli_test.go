@@ -116,6 +116,7 @@ func TestCliCheck(t *testing.T) {
 				fmt.Errorf("Can't read config file: stat NONEXISTENT: no such file or directory"),
 				fmt.Errorf("Can't read config file: GetFileAttributesEx NONEXISTENT: The system cannot find the file specified."),
 				fmt.Errorf("Can't read config file: CreateFile NONEXISTENT: The system cannot find the file specified."),
+				fmt.Errorf("Can't read config file: FindFirstFile NONEXISTENT: The system cannot find the file specified."),
 			},
 		},
 		{
