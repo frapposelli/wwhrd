@@ -14,7 +14,6 @@ set -e
 workdir=.cover
 profile="$workdir/cover.out"
 mode=atomic
-dir=$(dirname $0)
 
 # list any files (or patterns) to explicitly exclude from coverage
 # you should have a pretty good reason before putting items here
@@ -24,26 +23,26 @@ exclude_files=(
 
 join() { local IFS="$1"; shift; echo "$*"; }
 
-excludes=$(join "|" ${exclude_files[@]} | sed -e 's/\./\\./g')
+excludes=$(join "|" "${exclude_files[@]}" | sed -e 's/\./\\./g')
 
 generate_cover_data() {
     rm -rf "$workdir"
     mkdir "$workdir"
 
     for pkg in "$@"; do
-        f="$workdir/$(echo $pkg | tr / -).cover"
-        go test -race -v -covermode="$mode" -coverprofile="$f" "$pkg"
+        f="$workdir"/"$(echo "$pkg" | tr / -)".cover
+        go test -mod=vendor -race -v -covermode="$mode" -coverprofile="$f" "$pkg"
     done
 
     echo "mode: $mode" >"$profile"
-    grep -h -v "^mode:" "$workdir"/*.cover | egrep -v "$excludes" >>"$profile"
+    grep -h -v "^mode:" "$workdir"/*.cover | grep -E -v "$excludes" >>"$profile"
 }
 
 show_cover_report() {
-    go tool cover -${1}="$profile"
+    go tool cover -"${1}"="$profile"
 }
 
-generate_cover_data $(go list ./... | grep -v /vendor/)
+generate_cover_data "$(go list -mod=vendor ./... | grep -v /vendor/)"
 show_cover_report func
 case "$1" in
 "")

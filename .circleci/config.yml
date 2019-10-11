@@ -2,24 +2,14 @@ version: 2.0
 
 shared: &shared
   working_directory: /go/src/github.com/frapposelli/wwhrd
+  environment:
+    GO111MODULE: "on"
   steps:
     - checkout
     - run: hack/coverage
     - run: go install -v github.com/frapposelli/wwhrd
     - run: wwhrd check
 jobs:
-  "golang-1.8":
-    <<: *shared
-    docker:
-      - image: circleci/golang:1.8
-  "golang-1.9":
-    <<: *shared
-    docker:
-      - image: circleci/golang:1.9
-  "golang-1.10":
-    <<: *shared
-    docker:
-      - image: circleci/golang:1.10
   "golang-1.11":
     <<: *shared
     docker:
@@ -28,6 +18,10 @@ jobs:
     <<: *shared
     docker:
       - image: circleci/golang:1.12
+  "golang-1.13":
+    <<: *shared
+    docker:
+      - image: circleci/golang:1.13
   release:
     docker:
       - image: circleci/golang:1.12
@@ -40,11 +34,9 @@ workflows:
   version: 2
   build:
     jobs:
-      - "golang-1.8"
-      - "golang-1.9"
-      - "golang-1.10"
       - "golang-1.11"
       - "golang-1.12"
+      - "golang-1.13"
   release:
     jobs:
       - release:
