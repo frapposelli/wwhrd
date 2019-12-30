@@ -1,16 +1,12 @@
 package main
 
 import (
-	"path/filepath"
 	"testing"
 
-	"github.com/ryanuber/go-license"
 	"github.com/stretchr/testify/assert"
 )
 
-//TestWalkImports test walking imports
 func TestWalkImports(t *testing.T) {
-
 	dir, rm := mockGoPackageDir(t, "TestWalkImports")
 	defer rm()
 
@@ -20,14 +16,16 @@ func TestWalkImports(t *testing.T) {
 	res := make(map[string]bool)
 	res["github.com/fake/package"] = true
 	res["github.com/fake/nested/inside/a/package"] = true
-
+	res["root"] = true
 	assert.Equal(t, res, pkgs)
+
+	negRes := make(map[string]bool)
+	negRes["github.com/this/does/not/exist"] = true
+	assert.NotEqual(t, negRes, pkgs)
 
 }
 
-//TestWalkImports test walking imports
 func TestGetLicenses(t *testing.T) {
-
 	dir, rm := mockGoPackageDir(t, "TestGetLicenses")
 	defer rm()
 
@@ -35,20 +33,9 @@ func TestGetLicenses(t *testing.T) {
 	assert.NoError(t, err)
 	lics := GetLicenses(dir, pkgs)
 
-	res := make(map[string]*license.License)
-	var lic license.License
-	var lic2 license.License
-	lic.File = filepath.Join(dir, "vendor/github.com/fake/package", "LICENSE")
-	lic.Text = mockLicense
-	lic.Type = "FreeBSD"
-
-	lic2.File = filepath.Join(dir, "vendor/github.com/fake/nested", "LICENSE")
-	lic2.Text = mockLicense
-	lic2.Type = "FreeBSD"
-
-	res["github.com/fake/package"] = &lic
-	res["github.com/fake/nested/inside/a/package"] = &lic2
+	res := make(map[string]string)
+	res["github.com/fake/package"] = "BSD-3-Clause"
+	res["github.com/fake/nested/inside/a/package"] = "BSD-3-Clause"
 
 	assert.Equal(t, res, lics)
-
 }

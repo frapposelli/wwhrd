@@ -28,5 +28,5 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_KEY }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_USERNAME: frapposelli
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

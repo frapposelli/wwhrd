@@ -8,11 +8,11 @@ on:
       - master
 jobs:
   ci:
-    name: Test on Go ${{ matrix.go_version }} and ${{ matrix.os }}
+    name: go${{ matrix.go_version }}/${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go_version: [1.11, 1.12, 1.13]
+        go_version: ['1.11.x', '1.12.x', '1.13.x']
         os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
     - name: Use Go ${{ matrix.go_version }}
@@ -26,8 +26,14 @@ jobs:
         bash hack/coverage
     - name: Install and check
       run: |
-        go build -mod=vendor -x
+        go build -mod=vendor
         bash -c "./wwhrd check"
-
+    - name: Upload coverage to Codecov  
+      uses: codecov/codecov-action@v1
+      if: matrix.go_version == '1.13.x' && matrix.os == 'ubuntu-latest'
+      with:
+        token: ${{ secrets.CODECOV_KEY }}
+        file: ./.cover/cover.out
+        fail_ci_if_error: true
 
 

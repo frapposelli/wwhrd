@@ -63,20 +63,37 @@ $ echo $?
 1
 ```
 
+## Generate a dependency graph
+
+Starting from version `v0.3.0`, `wwhrd graph` can be used to generate a graph in DOT language, the graph can then be parsed by Graphviz or other compatible tools.
+
+To generate a PNG of the dependencies of your repository, you can run:
+
+```console
+$ wwhrd graph osstptool -o - | dot -Tpng > wwhrd-graph.png
+```
+
+The `-o -` option will print the DOT output to `STDOUT`.
+
 ## Usage
 
 ```console
 $ wwhrd
 Usage:
-  wwhrd [OPTIONS] <check | list>
+  wwhrd [OPTIONS] <check | graph | list>
 
 What would Henry Rollins do?
 
+Application Options:
+  -v, --version  Show CLI version
+  -q, --quiet    quiet mode, do not log accepted packages
+
 Help Options:
-  -h, --help  Show this help message
+  -h, --help     Show this help message
 
 Available commands:
   check  Check licenses against config file (aliases: chk)
+  graph  Generate dot graph dependency tree (aliases: dot)
   list   List licenses (aliases: ls)
 ```
 
