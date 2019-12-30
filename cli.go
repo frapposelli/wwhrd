@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
@@ -12,6 +13,7 @@ import (
 type cliOpts struct {
 	List        `command:"list" alias:"ls" description:"List licenses"`
 	Check       `command:"check" alias:"chk" description:"Check licenses against config file"`
+	Graph       `command:"graph" alias:"dot" description:"Generate dot graph dependency tree"`
 	VersionFlag func() error `long:"version" short:"v" description:"Show CLI version"`
 
 	Quiet func() error `short:"q" long:"quiet" description:"quiet mode, do not log accepted packages"`
@@ -24,6 +26,10 @@ type List struct {
 type Check struct {
 	File    string `short:"f" long:"file" description:"input file" default:".wwhrd.yml"`
 	NoColor bool   `long:"no-color" description:"disable colored output"`
+}
+
+type Graph struct {
+	File string `short:"o" long:"output" description:"output file" default:"wwhrd-graph.dot"`
 }
 
 const VersionHelp flags.ErrorType = 1961
@@ -55,6 +61,48 @@ func newCli() *flags.Parser {
 	return parser
 }
 
+func (g *Graph) Execute(args []string) error {
+	root, err := rootDir()
+	if err != nil {
+		return err
+	}
+
+	log.Infof("Generating DOT graph")
+
+	dotGraph, err := GraphImports(root)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if g.File == "-" {
+		mf := bufio.NewWriter(os.Stdout)
+		defer mf.Flush()
+
+		_, err = mf.Write([]byte(dotGraph))
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	log.Debug("Creating file... ", g.File)
+	mf, err := os.Create(g.File)
+	if err != nil {
+		return err
+	}
+	defer mf.Close()
+
+	_, err = mf.Write([]byte(dotGraph))
+	if err != nil {
+		return err
+	}
+
+	log.Infof("Graph saved in %q", g.File)
+
+	return nil
+}
+
 func (l *List) Execute(args []string) error {
 
 	if l.NoColor {
@@ -75,16 +123,10 @@ func (l *List) Execute(args []string) error {
 	lics := GetLicenses(root, pkgs)
 
 	for k, v := range lics {
-		if v.Recognized() {
-			log.WithFields(log.Fields{
-				"package": k,
-				"license": v.Type,
-			}).Info("Found License")
-		} else {
-			log.WithFields(log.Fields{
-				"package": k,
-			}).Warning("Did not find recognized license!")
-		}
+		log.WithFields(log.Fields{
+			"package": k,
+			"license": v,
+		}).Info("Found License")
 	}
 
 	return nil
@@ -100,7 +142,7 @@ func (c *Check) Execute(args []string) error {
 
 	t, err := ReadConfig(c.File)
 	if err != nil {
-		err = fmt.Errorf("Can't read config file: %s", err)
+		err = fmt.Errorf("can't read config file: %s", err)
 		return err
 	}
 
@@ -132,7 +174,7 @@ func (c *Check) Execute(args []string) error {
 	exceptionsWildcard := make(map[string]bool)
 	for _, v := range t.Exceptions {
 		if strings.HasSuffix(v, "/...") {
-			exceptionsWildcard[strings.TrimRight(v, "/...")] = true
+			exceptionsWildcard[strings.TrimSuffix(v, "/...")] = true
 		} else {
 			exceptions[v] = true
 		}
@@ -142,18 +184,18 @@ PackageList:
 	for pkg, lic := range lics {
 		contextLogger := log.WithFields(log.Fields{
 			"package": pkg,
-			"license": lic.Type,
+			"license": lic,
 		})
 
 		// License is whitelisted and not specified in blacklist
-		if whitelist[lic.Type] && !blacklist[lic.Type] {
+		if whitelist[lic] && !blacklist[lic] {
 			contextLogger.Info("Found Approved license")
 			continue PackageList
 		}
 
 		// if we have exceptions wildcards, let's run through them
 		if len(exceptionsWildcard) > 0 {
-			for wc, _ := range exceptionsWildcard {
+			for wc := range exceptionsWildcard {
 				if strings.HasPrefix(pkg, wc) {
 					// we have a match
 					contextLogger.Warn("Found exceptioned package")

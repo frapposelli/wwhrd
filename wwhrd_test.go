@@ -87,12 +87,12 @@ func TestCliCommandsErrors(t *testing.T) {
 
 var mockConf = `---
 whitelist:
-  - FreeBSD
+  - BSD-3-Clause
 `
 
 var mockConfBL = `---
 blacklist:
-  - FreeBSD
+  - BSD-3-Clause
 `
 
 var mockConfEX = `---

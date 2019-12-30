@@ -5,6 +5,6 @@ blacklist:
 whitelist:
   - Apache-2.0
   - MIT
-  - NewBSD
-  - FreeBSD
   - ISC
+  - BSD-2-Clause
+  - BSD-3-Clause
