@@ -1,10 +1,13 @@
-name: Go
-on: 
+name: ci
+on:
   pull_request:
     branches:
-    - master
+      - master
+  push:
+    branches:
+      - master
 jobs:
-  build:
+  ci:
     name: Test on Go ${{ matrix.go_version }} and ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:

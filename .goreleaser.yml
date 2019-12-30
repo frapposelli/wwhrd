@@ -40,3 +40,6 @@ brews:
     description: "Have Henry Rollins check vendored licenses in your Go project."
     test: |
       system "#{bin}/wwhrd -v"
+signs:
+  - artifacts: checksum
+    args: ["--batch", "-u", "EEFFE74B", "--output", "${signature}", "--detach-sign", "${artifact}"]
