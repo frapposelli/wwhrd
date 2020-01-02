@@ -1,6 +1,6 @@
-# WWHRD? (What Would Henry Rollins Do?) [![CircleCI](https://circleci.com/gh/frapposelli/wwhrd/tree/master.svg?style=svg)](https://circleci.com/gh/frapposelli/wwhrd/tree/master) [![codecov](https://codecov.io/gh/frapposelli/wwhrd/branch/master/graph/badge.svg)](https://codecov.io/gh/frapposelli/wwhrd)
+# WWHRD? (What Would Henry Rollins Do?) [![Github Actions](https://github.com/frapposelli/wwhrd/workflows/ci/badge.svg)](https://github.com/frapposelli/wwhrd/actions?query=workflow%3Aci) [![codecov](https://codecov.io/gh/frapposelli/wwhrd/branch/master/graph/badge.svg)](https://codecov.io/gh/frapposelli/wwhrd)
 
-![WWHRD?](http://frapposelli.github.io/wwhrd/img/wwhrd.png)
+![WWHRD?](./hack/wwhrd.svg)
 
 Have Henry Rollins check vendored licenses in your Go project.
 
