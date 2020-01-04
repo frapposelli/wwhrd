@@ -70,7 +70,7 @@ Starting from version `v0.3.0`, `wwhrd graph` can be used to generate a graph in
 To generate a PNG of the dependencies of your repository, you can run:
 
 ```console
-$ wwhrd graph osstptool -o - | dot -Tpng > wwhrd-graph.png
+$ wwhrd graph -o - | dot -Tpng > wwhrd-graph.png
 ```
 
 The `-o -` option will print the DOT output to `STDOUT`.
