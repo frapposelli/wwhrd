@@ -24,7 +24,10 @@ _testmain.go
 
 wwhrd
 wwhrd.exe
+wwhrd-graph.png
 
 .cover
+.vscode
 
 dist/
+

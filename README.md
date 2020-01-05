@@ -53,12 +53,16 @@ Use it in your CI!
 
 ```console
 $ wwhrd check
-INFO[0000] Found Approved license                        license=MIT package=github.com/stretchr/testify/assert
-ERRO[0000] Found Non-Approved license                    license=FreeBSD package=github.com/pmezard/go-difflib/difflib
-INFO[0000] Found Approved license                        license=MIT package=github.com/ryanuber/go-license
-INFO[0000] Found Approved license                        license=Apache-2.0 package=github.com/cloudfoundry-incubator/candiedyaml
-WARN[0000] Found exceptioned package                     license=NewBSD package=github.com/jessevdk/go-flags
-FATA[0000] Exiting: Non-Approved license found
+INFO[0006] Found Approved license                        license=Apache-2.0 package="github.com/xanzy/ssh-agent"
+INFO[0006] Found Approved license                        license=BSD-3-Clause package="golang.org/x/crypto/ed25519"
+INFO[0006] Found Approved license                        license=Apache-2.0 package="gopkg.in/src-d/go-git.v4/internal/revision"
+INFO[0006] Found Approved license                        license=Apache-2.0 package="gopkg.in/src-d/go-git.v4/plumbing/format/config"
+INFO[0006] Found Approved license                        license=BSD-3-Clause package="golang.org/x/exp/rand"
+INFO[0006] Found Approved license                        license=BSD-3-Clause package="gonum.org/v1/gonum/internal/cmplx64"
+INFO[0006] Found Approved license                        license=Apache-2.0 package="gopkg.in/src-d/go-git.v4/plumbing/cache"
+INFO[0006] Found Approved license                        license=MIT package="github.com/montanaflynn/stats"
+INFO[0006] Found Approved license                        license=MIT package="github.com/ekzhu/minhash-lsh"
+FATA[0006] Exiting: Non-Approved license found
 $ echo $?
 1
 ```
