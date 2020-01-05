@@ -40,3 +40,5 @@ brews:
     description: "Have Henry Rollins check vendored licenses in your Go project."
     test: |
       system "#{bin}/wwhrd -v"
+    install: |
+      bin.install "program"
