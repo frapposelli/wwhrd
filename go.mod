@@ -10,3 +10,5 @@ require (
 	gopkg.in/src-d/go-license-detector.v3 v3.0.2
 	gopkg.in/yaml.v2 v2.2.2
 )
+
+replace github.com/ekzhu/minhash-lsh => github.com/ekzhu/minhash-lsh v0.0.0-20171225071031-5c06ee8586a1
