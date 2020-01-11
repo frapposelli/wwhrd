@@ -27,11 +27,11 @@ func TestCliListSuccess(t *testing.T) {
 	}{
 		{
 			[]string{"list"},
-			[]string{`level=info msg="Found License" license=BSD-3-Clause package="github.com/fake/package"`, `level=info msg="Found License" license=BSD-3-Clause package="github.com/fake/nested/inside/a/package"`},
+			[]string{`level=info msg="Found License" license=BSD-3-Clause package=github.com/fake/package`, `level=info msg="Found License" license=BSD-3-Clause package=github.com/fake/nested/inside/a/package`},
 		},
 		{
 			[]string{"ls"},
-			[]string{`level=info msg="Found License" license=BSD-3-Clause package="github.com/fake/nested/inside/a/package"`, `level=info msg="Found License" license=BSD-3-Clause package="github.com/fake/nested/inside/a/package"`},
+			[]string{`level=info msg="Found License" license=BSD-3-Clause package=github.com/fake/nested/inside/a/package`, `level=info msg="Found License" license=BSD-3-Clause package=github.com/fake/nested/inside/a/package`},
 		},
 	}
 
@@ -75,22 +75,22 @@ func TestCliCheck(t *testing.T) {
 	}{
 		{
 			[]string{"check"},
-			[]string{`level=info msg="Found Approved license" license=BSD-3-Clause package="github.com/fake/package"`, `level=info msg="Found Approved license" license=BSD-3-Clause package="github.com/fake/nested/inside/a/package"`},
+			[]string{`level=info msg="Found Approved license" license=BSD-3-Clause package=github.com/fake/package`, `level=info msg="Found Approved license" license=BSD-3-Clause package=github.com/fake/nested/inside/a/package`},
 			[]error{nil},
 		},
 		{
 			[]string{"check", "-f", ".wwhrd-ex.yml"},
-			[]string{`level=warning msg="Found exceptioned package" license=BSD-3-Clause package="github.com/fake/package"`, `level=warning msg="Found exceptioned package" license=BSD-3-Clause package="github.com/fake/nested/inside/a/package"`},
+			[]string{`level=warning msg="Found exceptioned package" license=BSD-3-Clause package=github.com/fake/package`, `level=warning msg="Found exceptioned package" license=BSD-3-Clause package=github.com/fake/nested/inside/a/package`},
 			[]error{nil},
 		},
 		{
 			[]string{"check", "-f", ".wwhrd-exwc.yml"},
-			[]string{`level=warning msg="Found exceptioned package" license=BSD-3-Clause package="github.com/fake/package"`, `level=warning msg="Found exceptioned package" license=BSD-3-Clause package="github.com/fake/nested/inside/a/package"`},
+			[]string{`level=warning msg="Found exceptioned package" license=BSD-3-Clause package=github.com/fake/package`, `level=warning msg="Found exceptioned package" license=BSD-3-Clause package=github.com/fake/nested/inside/a/package`},
 			[]error{nil},
 		},
 		{
 			[]string{"check", "-f", ".wwhrd-bl.yml"},
-			[]string{`level=error msg="Found Non-Approved license" license=BSD-3-Clause package="github.com/fake/package"`, `level=error msg="Found Non-Approved license" license=BSD-3-Clause package="github.com/fake/nested/inside/a/package"`},
+			[]string{`level=error msg="Found Non-Approved license" license=BSD-3-Clause package=github.com/fake/package`, `level=error msg="Found Non-Approved license" license=BSD-3-Clause package=github.com/fake/nested/inside/a/package`},
 			[]error{fmt.Errorf("Non-Approved license found")},
 		},
 		{
@@ -106,7 +106,8 @@ func TestCliCheck(t *testing.T) {
 		{
 			[]string{"check", "-f", ".wwhrd-botched.yml"},
 			[]string{""},
-			[]error{fmt.Errorf("can't read config file: Invalid timestamp: 'whitelist - THISMAKESNOSENSE' at line 1, column 0")},
+			[]error{fmt.Errorf(`can't read config file: yaml: unmarshal errors:
+  line 2: cannot unmarshal !!str ` + "`whiteli...`" + ` into main.Config`)},
 		},
 	}
 

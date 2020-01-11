@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	yaml "github.com/cloudfoundry-incubator/candiedyaml"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type Config struct {
