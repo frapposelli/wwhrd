@@ -24,7 +24,7 @@ func (e Exponential) CDF(x float64) float64 {
 	if x < 0 {
 		return 0
 	}
-	return 1 - math.Exp(-e.Rate*x)
+	return -math.Expm1(-e.Rate * x)
 }
 
 // ConjugateUpdate updates the parameters of the distribution from the sufficient
@@ -38,12 +38,13 @@ func (e Exponential) CDF(x float64) float64 {
 // As a result of this function, Exponential.Rate is updated based on the weighted
 // samples, and priorStrength is modified to include the new number of samples observed.
 //
-// This function panics if len(suffStat) != 1 or len(priorStrength) != 1.
+// This function panics if len(suffStat) != e.NumSuffStat() or
+// len(priorStrength) != e.NumSuffStat().
 func (e *Exponential) ConjugateUpdate(suffStat []float64, nSamples float64, priorStrength []float64) {
-	if len(suffStat) != 1 {
+	if len(suffStat) != e.NumSuffStat() {
 		panic("exponential: incorrect suffStat length")
 	}
-	if len(priorStrength) != 1 {
+	if len(priorStrength) != e.NumSuffStat() {
 		panic("exponential: incorrect priorStrength length")
 	}
 

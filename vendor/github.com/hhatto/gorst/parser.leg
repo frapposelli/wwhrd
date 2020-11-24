@@ -302,7 +302,7 @@ GridTableRow = Sp '|' Sp
 		}
 
 TableCell = a:StartList
-            ( ':' | '>' | '<' | '/' | '-' | Spacechar | EscapedChar | Alphanumeric | Sp )+
+            ( ':' | '>' | '<' | '/' | '-' | Spacechar | EscapedChar | Alphanumeric )+
 		    {
 			}
 
@@ -681,7 +681,7 @@ Link =  ReferenceLink | ExplicitLink | AutoLink
 
 ReferenceLink = UnquotedRefLinkUnderbar | QuotedRefLinkUnderbar
 
-UnquotedRefLinkUnderbar = < a:UnquotedLinkSource > '_' (Spacechar|Newline)+
+UnquotedRefLinkUnderbar = < a:UnquotedLinkSource > '_' ( !Alphanumeric )
                        {
                            if match, found := p.findReference(p.mkString(a.contents.str)); found {
                                $$ = p.mkLink(p.mkString(a.contents.str), match.url, match.title)
@@ -731,7 +731,7 @@ EmbeddedLink = a:StartList '`' l:EmbeddedRefSource "<" < [A-Za-z]+ "://" ( !Newl
 					$$ = p.mkLink(p.mkString(l.contents.str), yytext, "")
 			   }
 
-AutoLinkUrl =   < [A-Za-z]+ "://" ( !Newline !'>' . )+ >
+AutoLinkUrl =   < [A-Za-z]+ "://" ( !([.-_] Newline) !'. ' !Newline !'>' [-A-Za-z0-9_.'/?=] )+ >
                 { $$ = p.mkLink(p.mkString(yytext), yytext, "") }
 
 AutoLinkEmail = '<' ( "mailto:" )? < [-A-Za-z0-9+_./!%~$]+ '@' ( !Newline !'>' . )+ > '>'
@@ -758,14 +758,6 @@ UnquotedReference = NonindentSpace
                 c = nil
                 $$.key = REFERENCE
             }
-
-UrlReference = ( NonindentSpace | Sp )
-               ":target:" Sp s:RefSrc BlankLine
-                {
-                    $$ = p.mkLink(p.mkString(yytext), yytext, "")
-                    s = nil
-                    $$.key = REFERENCE
-                }
 
 UnquotedLinkSource  = < ( ( !'_' !':' !'`' ( Nonspacechar ) )+ )* >
               { $$ = p.mkString(yytext) }

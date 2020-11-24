@@ -1,4 +1,4 @@
-# This is the official list of gonum authors for copyright purposes.
+# This is the official list of Gonum authors for copyright purposes.
 # This file is distinct from the CONTRIBUTORS files.
 # See the latter for an explanation.
 
@@ -9,6 +9,7 @@
 # Please keep the list sorted.
 
 Alexander Egurnov <alexander.egurnov@gmail.com>
+Andrei Blinnikov <goofinator@mail.ru>
 Bill Gray <wgray@gogray.com>
 Bill Noon <noon.bill@gmail.com>
 Brendan Tracey <tracey.brendan@gmail.com>
@@ -45,7 +46,6 @@ James Bell <james@stellentus.com>
 James Bowman <james.edward.bowman@gmail.com>
 James Holmes <32bitkid@gmail.com>
 Janne Snabb <snabb@epipe.com>
-Jeff Juozapaitis <jjjuozap@email.arizona.edu>
 Jeremy Atkinson <jchatkinson@gmail.com>
 Jonas Kahler <jonas@derkahler.de>
 Jonas Schulze <jonas.schulze@ovgu.de>
@@ -62,6 +62,7 @@ Kirill Motkov <motkov.kirill@gmail.com>
 Konstantin Shaposhnikov <k.shaposhnikov@gmail.com>
 Leonid Kneller <recondite.matter@gmail.com>
 Lyron Winderbaum <lyron.winderbaum@student.adelaide.edu.au>
+Marco Leogrande <dark.knight.ita@gmail.com>
 Martin Diz <github@martindiz.com.ar>
 Matthieu Di Mercurio <matthieu.dimercurio@gmail.com>
 Max Halford <maxhalford25@gmail.com>
@@ -72,7 +73,7 @@ Nils Wogatzky <odog@netcologne.de>
 Olivier Wulveryck <olivier.wulveryck@gmail.com>
 Or Rikon <rikonor@gmail.com>
 Pontus Melke <pontusmelke@gmail.com>
-Renée French
+Renee French
 Rishi Desai <desai.rishi1@gmail.com>
 Robin Eklind <r.eklind.87@gmail.com>
 Sam Zaydel <szaydel@gmail.com>
@@ -81,6 +82,7 @@ Saran Ahluwalia <ahlusar.ahluwalia@gmail.com>
 Scott Holden <scott@sshconnection.com>
 Sebastien Binet <seb.binet@gmail.com>
 Shawn Smith <shawnpsmith@gmail.com>
+Sintela Ltd
 source{d} <hello@sourced.tech>
 Spencer Lyon <spencerlyon2@gmail.com>
 Steve McCoy <mccoyst@gmail.com>
@@ -95,3 +97,5 @@ Vincent Thiery <vjmthiery@gmail.com>
 Vladimír Chalupecký <vladimir.chalupecky@gmail.com>
 Yevgeniy Vahlis <evahlis@gmail.com>
 Yucheng Zhu <zyctc000@gmail.com>
+Zoe Juozapaitis
+Patrick DeVivo <patrick@tickgit.com>

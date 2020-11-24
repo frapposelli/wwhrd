@@ -11,7 +11,7 @@ type MinWise struct {
 
 type Hash64 func([]byte) uint64
 
-// NewMinWise returns a new MinWise Hashsing implementation
+// NewMinWise returns a new MinWise Hashing implementation
 func NewMinWise(h1, h2 Hash64, size int) *MinWise {
 
 	minimums := make([]uint64, size)
@@ -23,6 +23,19 @@ func NewMinWise(h1, h2 Hash64, size int) *MinWise {
 		h1:       h1,
 		h2:       h2,
 		minimums: minimums,
+	}
+}
+
+// NewMinWiseFromSignatures returns a new MinWise Hashing implementation
+// using a user-provided set of signatures
+func NewMinWiseFromSignatures(h1, h2 Hash64, signatures []uint64) *MinWise {
+
+	minimums := make([]uint64, len(signatures))
+	copy(minimums, signatures)
+	return &MinWise{
+		h1:       h1,
+		h2:       h2,
+		minimums: signatures,
 	}
 }
 
