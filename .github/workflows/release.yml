@@ -20,7 +20,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.13.x
+          go-version: 1.15.x
       - name: Registry login
         run: docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} docker.io
         env:

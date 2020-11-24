@@ -10,8 +10,8 @@ import (
 	"sync"
 
 	"github.com/emicklei/dot"
+	"github.com/go-enry/go-license-detector/v4/licensedb"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/src-d/go-license-detector.v3/licensedb"
 )
 
 var overrides = map[string]string{}
