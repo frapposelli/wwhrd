@@ -71,7 +71,15 @@ func (b Beta) LogProb(x float64) float64 {
 	lab, _ := math.Lgamma(b.Alpha + b.Beta)
 	la, _ := math.Lgamma(b.Alpha)
 	lb, _ := math.Lgamma(b.Beta)
-	return lab - la - lb + (b.Alpha-1)*math.Log(x) + (b.Beta-1)*math.Log(1-x)
+	var lx float64
+	if b.Alpha != 1 {
+		lx = (b.Alpha - 1) * math.Log(x)
+	}
+	var l1mx float64
+	if b.Beta != 1 {
+		l1mx = (b.Beta - 1) * math.Log(1-x)
+	}
+	return lab - la - lb + lx + l1mx
 }
 
 // Mean returns the mean of the probability distribution.
@@ -81,10 +89,17 @@ func (b Beta) Mean() float64 {
 
 // Mode returns the mode of the distribution.
 //
-// Mode returns NaN if either parameter is less than or equal to 1 as a special case.
+// Mode returns NaN if both parametera are less than or equal to 1 as a special case,
+// 0 if only Alpha <= 1 and 1 if only Beta <= 1.
 func (b Beta) Mode() float64 {
-	if b.Alpha <= 1 || b.Beta <= 1 {
-		return math.NaN()
+	if b.Alpha <= 1 {
+		if b.Beta <= 1 {
+			return math.NaN()
+		}
+		return 0
+	}
+	if b.Beta <= 1 {
+		return 1
 	}
 	return (b.Alpha - 1) / (b.Alpha + b.Beta - 2)
 }

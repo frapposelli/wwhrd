@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Graph represents a dot graph with nodes and edges.
 type Graph struct {
 	AttributesMap
 	id        string
@@ -19,8 +20,12 @@ type Graph struct {
 	subgraphs map[string]*Graph
 	parent    *Graph
 	sameRank  map[string][]Node
+	//
+	nodeInitializer func(Node)
+	edgeInitializer func(Edge)
 }
 
+// NewGraph return a new initialized Graph.
 func NewGraph(options ...GraphOption) *Graph {
 	graph := &Graph{
 		AttributesMap: AttributesMap{attributes: map[string]interface{}{}},
@@ -38,7 +43,16 @@ func NewGraph(options ...GraphOption) *Graph {
 
 // ID sets the identifier of the graph.
 func (g *Graph) ID(newID string) *Graph {
+	if len(g.id) > 0 {
+		panic("cannot overwrite non-empty id ; both the old and the new could be in use and we cannot tell")
+	}
 	g.id = newID
+	return g
+}
+
+// Label sets the "label" attribute value.
+func (g *Graph) Label(label string) *Graph {
+	g.AttributesMap.Attr("label", label)
 	return g
 }
 
@@ -54,20 +68,34 @@ func (g *Graph) Root() *Graph {
 	return g.parent.Root()
 }
 
-// Subgraph returns the Graph with the given label ; creates one if absent.
-func (g *Graph) Subgraph(label string, options ...GraphOption) *Graph {
-	sub, ok := g.subgraphs[label]
+// FindSubgraph returns the subgraph of the graph or one from its parents.
+func (g *Graph) FindSubgraph(id string) (*Graph, bool) {
+	sub, ok := g.subgraphs[id]
+	if !ok {
+		if g.parent != nil {
+			return g.parent.FindSubgraph(id)
+		}
+	}
+	return sub, ok
+}
+
+// Subgraph returns the Graph with the given id ; creates one if absent.
+// The label attribute is also set to the id ; use Label() to overwrite it.
+func (g *Graph) Subgraph(id string, options ...GraphOption) *Graph {
+	sub, ok := g.subgraphs[id]
 	if ok {
 		return sub
 	}
 	sub = NewGraph(Sub)
-	sub.Attr("label", label)
-	sub.ID(fmt.Sprintf("s%d", len(g.subgraphs)))
+	sub.Attr("label", id) // for consistency with Node creation behavior.
+	sub.id = fmt.Sprintf("s%d", g.nextSeq())
 	for _, each := range options {
 		each.Apply(sub)
 	}
 	sub.parent = g
-	g.subgraphs[label] = sub
+	sub.edgeInitializer = g.edgeInitializer
+	sub.nodeInitializer = g.nodeInitializer
+	g.subgraphs[id] = sub
 	return sub
 }
 
@@ -81,22 +109,40 @@ func (g *Graph) findNode(id string) (Node, bool) {
 	return g.parent.findNode(id)
 }
 
+// nextSeq takes the next sequence number from the root graph
+func (g *Graph) nextSeq() int {
+	root := g.Root()
+	root.seq++
+	return root.seq
+}
+
+// NodeInitializer sets a function that is called (if not nil) when a Node is implicitly created.
+func (g *Graph) NodeInitializer(callback func(n Node)) {
+	g.nodeInitializer = callback
+}
+
+// EdgeInitializer sets a function that is called (if not nil) when an Edge is implicitly created.
+func (g *Graph) EdgeInitializer(callback func(e Edge)) {
+	g.edgeInitializer = callback
+}
+
 // Node returns the node created with this id or creates a new node if absent.
+// The node will have a label attribute with the id as its value. Use Label() to overwrite this.
 // This method can be used as both a constructor and accessor.
 // not thread safe!
 func (g *Graph) Node(id string) Node {
 	if n, ok := g.findNode(id); ok {
 		return n
 	}
-	// create a new, use root sequence
-	root := g.Root()
-	root.seq++
 	n := Node{
 		id:  id,
-		seq: root.seq,
+		seq: g.nextSeq(), // create a new, use root sequence
 		AttributesMap: AttributesMap{attributes: map[string]interface{}{
 			"label": id}},
 		graph: g,
+	}
+	if g.nodeInitializer != nil {
+		g.nodeInitializer(n)
 	}
 	// store local
 	g.nodes[id] = n
@@ -119,6 +165,9 @@ func (g *Graph) Edge(fromNode, toNode Node, labels ...string) Edge {
 		graph:         edgeOwner}
 	if len(labels) > 0 {
 		e.Attr("label", strings.Join(labels, ","))
+	}
+	if g.edgeInitializer != nil {
+		g.edgeInitializer(e)
 	}
 	edgeOwner.edgesFrom[fromNode.id] = append(edgeOwner.edgesFrom[fromNode.id], e)
 	return e
@@ -167,10 +216,6 @@ func (g Graph) Write(w io.Writer) {
 func (g Graph) IndentedWrite(w *IndentWriter) {
 	fmt.Fprintf(w, "%s %s {", g.graphType, g.id)
 	w.NewLineIndentWhile(func() {
-		if len(g.id) > 0 {
-			fmt.Fprintf(w, "ID = %q;", g.id)
-			w.NewLine()
-		}
 		// subgraphs
 		for _, key := range g.sortedSubgraphsKeys() {
 			each := g.subgraphs[key]
@@ -211,6 +256,7 @@ func (g Graph) IndentedWrite(w *IndentWriter) {
 		}
 	})
 	fmt.Fprintf(w, "}")
+	w.NewLine()
 }
 
 func appendSortedMap(m map[string]interface{}, mustBracket bool, b io.Writer) {
@@ -250,4 +296,41 @@ func appendSortedMap(m map[string]interface{}, mustBracket bool, b io.Writer) {
 	} else {
 		fmt.Fprint(b, ";")
 	}
+}
+
+// VisitNodes visits all nodes recursively
+func (g Graph) VisitNodes(callback func(node Node) (done bool)) {
+	for _, node := range g.nodes {
+		done := callback(node)
+		if done {
+			return
+		}
+	}
+
+	for _, subGraph := range g.subgraphs {
+		subGraph.VisitNodes(callback)
+	}
+}
+
+// FindNodeById return node by id
+func (g Graph) FindNodeById(id string) (foundNode Node, found bool) {
+	g.VisitNodes(func(node Node) (done bool) {
+		if node.id == id {
+			found = true
+			foundNode = node
+			return true
+		}
+		return false
+	})
+	return
+}
+
+// FindNodes returns all nodes recursively
+func (g Graph) FindNodes() (nodes []Node) {
+	var foundNodes []Node
+	g.VisitNodes(func(node Node) (done bool) {
+		foundNodes = append(foundNodes, node)
+		return false
+	})
+	return foundNodes
 }

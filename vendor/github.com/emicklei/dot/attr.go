@@ -18,6 +18,19 @@ type AttributesMap struct {
 	attributes map[string]interface{}
 }
 
+// Attrs sets multiple values for attributes (unless empty) taking a label,value list
+// E.g  Attrs("style","filled","fillcolor","red")
+func (a AttributesMap) Attrs(labelvalues ...interface{}) {
+	if len(labelvalues)%2 != 0 {
+		panic("missing label or value ; must provide pairs")
+	}
+	for i := 0; i < len(labelvalues); i += 2 {
+		label := labelvalues[i].(string)
+		value := labelvalues[i+1]
+		a.Attr(label, value)
+	}
+}
+
 // Attr sets the value for an attribute (unless empty).
 func (a AttributesMap) Attr(label string, value interface{}) {
 	if len(label) == 0 || value == nil {
@@ -35,4 +48,9 @@ func (a AttributesMap) Attr(label string, value interface{}) {
 // Value return the value added for this label.
 func (a AttributesMap) Value(label string) interface{} {
 	return a.attributes[label]
+}
+
+// Delete removes the attribute value at key, if any
+func (a AttributesMap) Delete(key string) {
+	delete(a.attributes, key)
 }
