@@ -30,7 +30,7 @@ dockers:
     dockerfile: Dockerfile
 brews:
   - folder: Formula
-    github:
+    tap:
       owner: frapposelli
       name: homebrew-tap
     commit_author:
