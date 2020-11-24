@@ -23,7 +23,7 @@ func main() {
 			case typ == flags.ErrCommandRequired && len(c[0]) == 0:
 				parser.WriteHelp(os.Stdout)
 			default:
-				log.Info(err.Error() + string(typ))
+				log.Info(err.Error() + fmt.Sprint(typ))
 				parser.WriteHelp(os.Stdout)
 			}
 		} else {
