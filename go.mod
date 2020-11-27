@@ -5,7 +5,6 @@ go 1.15
 require (
 	github.com/Microsoft/go-winio v0.4.15 // indirect
 	github.com/dgryski/go-minhash v0.0.0-20190315135803-ad340ca03076 // indirect
-	github.com/ekzhu/minhash-lsh v0.0.0-20190924033628-faac2c6342f8 // indirect
 	github.com/emicklei/dot v0.15.0
 	github.com/go-enry/go-license-detector/v4 v4.0.0
 	github.com/jdkato/prose v1.2.0 // indirect
