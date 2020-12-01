@@ -31,7 +31,7 @@ func TestGetLicenses(t *testing.T) {
 
 	pkgs, err := WalkImports(dir)
 	assert.NoError(t, err)
-	lics := GetLicenses(dir, pkgs)
+	lics := GetLicenses(dir, pkgs, 75)
 
 	res := make(map[string]string)
 	res["github.com/fake/package"] = "BSD-3-Clause"

@@ -4,19 +4,78 @@ import (
 	"fmt"
 	"go/parser"
 	"go/token"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/emicklei/dot"
-	"github.com/go-enry/go-license-detector/v4/licensedb"
+	"github.com/google/licensecheck"
 	log "github.com/sirupsen/logrus"
 )
 
-var overrides = map[string]string{}
+const (
+	unknownLicense string = "UNKNOWN"
+)
 
-// dependencies are tracked as a graph, but the graph itself is not used to build the nodelist
+var (
+	// FileNames used to search for licenses
+	FileNames = []string{
+		"COPYING",
+		"COPYING.md",
+		"COPYING.markdown",
+		"COPYING.txt",
+		"LICENCE",
+		"LICENCE.md",
+		"LICENCE.markdown",
+		"LICENCE.txt",
+		"LICENSE",
+		"LICENSE.md",
+		"LICENSE.markdown",
+		"LICENSE.txt",
+		"LICENSE-2.0.txt",
+		"LICENCE-2.0.txt",
+		"LICENSE-APACHE",
+		"LICENCE-APACHE",
+		"LICENSE-APACHE-2.0.txt",
+		"LICENCE-APACHE-2.0.txt",
+		"LICENSE-MIT",
+		"LICENCE-MIT",
+		"LICENSE.MIT",
+		"LICENCE.MIT",
+		"LICENSE.code",
+		"LICENCE.code",
+		"LICENSE.docs",
+		"LICENCE.docs",
+		"LICENSE.rst",
+		"LICENCE.rst",
+		"MIT-LICENSE",
+		"MIT-LICENCE",
+		"MIT-LICENSE.md",
+		"MIT-LICENCE.md",
+		"MIT-LICENSE.markdown",
+		"MIT-LICENCE.markdown",
+		"MIT-LICENSE.txt",
+		"MIT-LICENCE.txt",
+		"MIT_LICENSE",
+		"MIT_LICENCE",
+		"UNLICENSE",
+		"UNLICENCE",
+	}
+)
+
+// fileNamesLowercase has all the entries of FileNames, lower cased and made a set
+// for fast case-insensitive matching.
+var fileNamesLowercase = map[string]bool{}
+
+func init() {
+	for _, f := range FileNames {
+		fileNamesLowercase[strings.ToLower(f)] = true
+	}
+}
+
+// dependencies are tracked as a graph, but the graph itself is not used to build the node list
 type dependencies struct {
 	nodes     []*node
 	nodesList map[string]bool
@@ -163,7 +222,7 @@ func (g *dependencies) WalkNode(n *node) {
 			if _, err := os.Stat(pkgdir); !os.IsNotExist(err) {
 
 				// Add imported pkg to the graph
-				vendornode := node{pkg: vendorpkg, dir: pkgdir, vendor: n.vendor}
+				var vendornode = node{pkg: vendorpkg, dir: pkgdir, vendor: n.vendor}
 				log.Debugf("[%s] adding node", vendornode.pkg)
 				if err := g.addNode(&vendornode); err != nil {
 					log.Debug(err.Error())
@@ -213,63 +272,93 @@ func GraphImports(root string) (string, error) {
 	return graph.getDotGraph(), nil
 }
 
-func GetLicenses(root string, list map[string]bool) map[string]string {
-	lics := make(map[string]string)
+func GetLicenses(root string, list map[string]bool, threshold float64) map[string]string {
+
+	checker, err := licensecheck.NewScanner(licensecheck.BuiltinLicenses())
+	if err != nil {
+		log.Fatal("Cannot initialize LicenseChecker")
+	}
+
+	var lics = make(map[string]string)
 
 	if !strings.HasSuffix(root, "vendor") {
 		root = filepath.Join(root, "vendor")
 	}
-
+	log.Debug("Start walking paths for LICENSE discovery")
 	for k := range list {
-		fpath := filepath.Join(root, k)
+
+		var fpath = filepath.Join(root, k)
 		pkg, err := os.Stat(fpath)
+
 		if err != nil {
 			continue
 		}
 		if pkg.IsDir() {
+			log.Debugf("Walking path: %s", fpath)
 
-			log.Debugf("[%s] Analyzing %q", k, fpath)
-			l := licensedb.Analyse(fpath)
-			if l[0].ErrStr != "" {
-				var found bool
-				// the package might be part of the overrides, let's check for that
-				for p, l := range overrides {
-					if strings.Contains(k, p) {
-						lics[k] = l
-						found = true
-					}
-				}
-				// the package might be nested inside a larger package, we try to find
-				// the license walking back to the beginning of the path.
-				pak := strings.Split(k, "/")
-				var path string
-				for y := range pak {
-					path = filepath.Join(root, strings.Join(pak[:len(pak)-y], "/"))
-					log.Debugf("[%s] Analyzing %q", k, path)
-					bal := licensedb.Analyse(path)
-					if bal[0].ErrStr != "" {
-						continue
-					} else {
-						// We found a license in the leftmost package, that's enough for now
-						if len(bal[0].Matches) > 0 {
-							lics[k] = bal[0].Matches[0].License
-							found = true
-						}
-						break
-					}
-				}
-
-				if !found {
-					// if our search didn't bear any fruit, ¯\_(ツ)_/¯
-					lics[k] = "UNKNOWN"
-				}
-				continue
+			waa := scanDir(checker, fpath, threshold)
+			if waa != "" {
+				lics[k] = waa
 			}
-			lics[k] = l[0].Matches[0].License
+
 		}
+
 	}
 
 	return lics
+}
+
+func scanDir(checker *licensecheck.Scanner, fpath string, threshold float64) string {
+	var license = ""
+
+	filesInDir, err := ioutil.ReadDir(fpath)
+	if err != nil {
+		return ""
+	}
+	for _, f := range filesInDir {
+		log.Debugf("Evaluating: %s", f.Name())
+		// if it's a directory or not in the list of well-known license files, we skip
+		if f.IsDir() || !fileNamesLowercase[strings.ToLower(f.Name())] {
+			log.Debugf("Skipping...")
+			continue
+		}
+
+		// Read the license file
+		text, err := ioutil.ReadFile(filepath.Join(fpath, f.Name()))
+		if err != nil {
+			log.Errorf("Cannot read file: %s because: %s", filepath.Join(fpath, f.Name()), err.Error())
+			continue
+		}
+
+		// Verify against the checker
+		cov := checker.Scan(text)
+		log.Debugf("%.1f%% of text covered by licenses:\n", cov.Percent)
+		for _, m := range cov.Match {
+			log.Debugf("%s at [%d:%d] IsURL=%v\n", m.ID, m.Start, m.End, m.IsURL)
+		}
+
+		// If the threshold is met, we qualify the license
+		if cov.Percent >= threshold {
+			license = cov.Match[0].ID
+		}
+
+	}
+
+	// if we didn't find any licenses after walking the path, we pop one out from it
+	if license == "" {
+		pak := strings.Split(filepath.ToSlash(fpath), "/")
+		// if we're 1 directories removed from vendor/ that means we couldn't find a decent license file
+		if pak[len(pak)-2] != "vendor" {
+			log.Debugf("Recursive call to scanDir starting from: %s going to: %s", fpath, filepath.FromSlash(strings.Join(pak[:len(pak)-1], "/")))
+			license = scanDir(checker, filepath.FromSlash(strings.Join(pak[:len(pak)-1], "/")), threshold)
+		}
+	}
+
+	if license == "" {
+		license = unknownLicense
+	}
+
+	return license
 }
 
 func shouldSkip(path string, info os.FileInfo) (bool, error) {

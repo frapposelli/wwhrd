@@ -17,15 +17,18 @@ type cliOpts struct {
 	VersionFlag func() error `long:"version" short:"v" description:"Show CLI version"`
 
 	Quiet func() error `short:"q" long:"quiet" description:"quiet mode, do not log accepted packages"`
+	Debug func() error `short:"d" long:"debug" description:"verbose mode, log everything"`
 }
 
 type List struct {
-	NoColor bool `long:"no-color" description:"disable colored output"`
+	NoColor           bool    `long:"no-color" description:"disable colored output"`
+	CoverageThreshold float64 `short:"c" long:"coverage" description:"coverage threshold is the minimum percentage of the file that must contain license text" default:"75"`
 }
 
 type Check struct {
-	File    string `short:"f" long:"file" description:"input file" default:".wwhrd.yml"`
-	NoColor bool   `long:"no-color" description:"disable colored output"`
+	File              string  `short:"f" long:"file" description:"input file" default:".wwhrd.yml"`
+	NoColor           bool    `long:"no-color" description:"disable colored output"`
+	CoverageThreshold float64 `short:"c" long:"coverage" description:"coverage threshold is the minimum percentage of the file that must contain license text" default:"75"`
 }
 
 type Graph struct {
@@ -45,6 +48,11 @@ func setQuiet() error {
 	return nil
 }
 
+func setDebug() error {
+	log.SetLevel(log.DebugLevel)
+	return nil
+}
+
 func newCli() *flags.Parser {
 	opts := cliOpts{
 		VersionFlag: func() error {
@@ -54,6 +62,7 @@ func newCli() *flags.Parser {
 			}
 		},
 		Quiet: setQuiet,
+		Debug: setDebug,
 	}
 	parser := flags.NewParser(&opts, flags.HelpFlag|flags.PassDoubleDash)
 	parser.LongDescription = "What would Henry Rollins do?"
@@ -120,7 +129,7 @@ func (l *List) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	lics := GetLicenses(root, pkgs)
+	lics := GetLicenses(root, pkgs, l.CoverageThreshold)
 
 	for k, v := range lics {
 		log.WithFields(log.Fields{
@@ -155,7 +164,7 @@ func (c *Check) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	lics := GetLicenses(root, pkgs)
+	lics := GetLicenses(root, pkgs, c.CoverageThreshold)
 
 	// Make a map out of the blacklist
 	blacklist := make(map[string]bool)
