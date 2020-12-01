@@ -91,6 +91,7 @@ What would Henry Rollins do?
 Application Options:
   -v, --version  Show CLI version
   -q, --quiet    quiet mode, do not log accepted packages
+  -d, --debug    verbose mode, log everything
 
 Help Options:
   -h, --help     Show this help message
