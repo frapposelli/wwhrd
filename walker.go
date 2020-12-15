@@ -81,6 +81,7 @@ type dependencies struct {
 	nodesList map[string]bool
 	edges     map[node][]*node
 	dotGraph  *dot.Graph
+	checkTest bool
 	sync.RWMutex
 }
 
@@ -90,9 +91,10 @@ type node struct {
 	vendor string
 }
 
-func newGraph() *dependencies {
+func newGraph(checkTest bool) *dependencies {
 	var g dependencies
 	g.nodesList = make(map[string]bool)
+	g.checkTest = checkTest
 	return &g
 }
 
@@ -205,7 +207,7 @@ func (g *dependencies) WalkNode(n *node) {
 		log.Debugf("walking %q", path)
 
 		// check if we need to skip this
-		if ok, err := shouldSkip(path, info); ok {
+		if ok, err := shouldSkip(path, info, g.checkTest); ok {
 			return err
 		}
 
@@ -244,9 +246,9 @@ func (g *dependencies) WalkNode(n *node) {
 
 }
 
-func WalkImports(root string) (map[string]bool, error) {
+func WalkImports(root string, checkTest bool) (map[string]bool, error) {
 
-	graph := newGraph()
+	graph := newGraph(checkTest)
 	rootNode := node{pkg: "root", dir: root, vendor: root}
 	if err := graph.addNode(&rootNode); err != nil {
 		log.Debug(err.Error())
@@ -258,9 +260,9 @@ func WalkImports(root string) (map[string]bool, error) {
 	return graph.nodesList, nil
 }
 
-func GraphImports(root string) (string, error) {
+func GraphImports(root string, checkTest bool) (string, error) {
 
-	graph := newGraph()
+	graph := newGraph(checkTest)
 	rootNode := node{pkg: "root", dir: root, vendor: root}
 	if err := graph.addNode(&rootNode); err != nil {
 		log.Debug(err.Error())
@@ -361,7 +363,7 @@ func scanDir(checker *licensecheck.Scanner, fpath string, threshold float64) str
 	return license
 }
 
-func shouldSkip(path string, info os.FileInfo) (bool, error) {
+func shouldSkip(path string, info os.FileInfo, checkTest bool) (bool, error) {
 	if info.IsDir() {
 		name := info.Name()
 		// check if directory is in the blocklist
@@ -377,7 +379,7 @@ func shouldSkip(path string, info os.FileInfo) (bool, error) {
 		return true, nil
 	}
 	// if it's a test file, skip
-	if strings.HasSuffix(path, "_test.go") {
+	if strings.HasSuffix(path, "_test.go") && !checkTest {
 		log.Debugf("skipping %q: test file", path)
 		return true, nil
 	}
