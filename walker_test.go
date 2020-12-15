@@ -10,7 +10,7 @@ func TestWalkImports(t *testing.T) {
 	dir, rm := mockGoPackageDir(t, "TestWalkImports")
 	defer rm()
 
-	pkgs, err := WalkImports(dir)
+	pkgs, err := WalkImports(dir, false)
 	assert.NoError(t, err)
 
 	res := make(map[string]bool)
@@ -29,7 +29,7 @@ func TestGetLicenses(t *testing.T) {
 	dir, rm := mockGoPackageDir(t, "TestGetLicenses")
 	defer rm()
 
-	pkgs, err := WalkImports(dir)
+	pkgs, err := WalkImports(dir, false)
 	assert.NoError(t, err)
 	lics := GetLicenses(dir, pkgs, 75)
 

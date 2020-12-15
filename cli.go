@@ -23,16 +23,19 @@ type cliOpts struct {
 type List struct {
 	NoColor           bool    `long:"no-color" description:"disable colored output"`
 	CoverageThreshold float64 `short:"c" long:"coverage" description:"coverage threshold is the minimum percentage of the file that must contain license text" default:"75"`
+	CheckTestFiles    bool    `short:"t" long:"check-test-files" description:"check imported dependencies for test files"`
 }
 
 type Check struct {
 	File              string  `short:"f" long:"file" description:"input file" default:".wwhrd.yml"`
 	NoColor           bool    `long:"no-color" description:"disable colored output"`
 	CoverageThreshold float64 `short:"c" long:"coverage" description:"coverage threshold is the minimum percentage of the file that must contain license text" default:"75"`
+	CheckTestFiles    bool    `short:"t" long:"check-test-files" description:"check imported dependencies for test files"`
 }
 
 type Graph struct {
-	File string `short:"o" long:"output" description:"output file" default:"wwhrd-graph.dot"`
+	File           string `short:"o" long:"output" description:"output file" default:"wwhrd-graph.dot"`
+	CheckTestFiles bool   `short:"t" long:"check-test-files" description:"check imported dependencies for test files"`
 }
 
 const VersionHelp flags.ErrorType = 1961
@@ -78,7 +81,7 @@ func (g *Graph) Execute(args []string) error {
 
 	log.Infof("Generating DOT graph")
 
-	dotGraph, err := GraphImports(root)
+	dotGraph, err := GraphImports(root, g.CheckTestFiles)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -125,7 +128,7 @@ func (l *List) Execute(args []string) error {
 		return err
 	}
 
-	pkgs, err := WalkImports(root)
+	pkgs, err := WalkImports(root, l.CheckTestFiles)
 	if err != nil {
 		return err
 	}
@@ -160,7 +163,7 @@ func (c *Check) Execute(args []string) error {
 		return err
 	}
 
-	pkgs, err := WalkImports(root)
+	pkgs, err := WalkImports(root, c.CheckTestFiles)
 	if err != nil {
 		return err
 	}
