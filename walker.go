@@ -21,6 +21,7 @@ const (
 
 var (
 	// FileNames used to search for licenses
+	// "LICENSE.docs" and "LICENCE.docs" are excluded from the list as we only care about source code in the repo.
 	FileNames = []string{
 		"COPYING",
 		"COPYING.md",
@@ -46,8 +47,6 @@ var (
 		"LICENCE.MIT",
 		"LICENSE.code",
 		"LICENCE.code",
-		"LICENSE.docs",
-		"LICENCE.docs",
 		"LICENSE.rst",
 		"LICENCE.rst",
 		"MIT-LICENSE",
