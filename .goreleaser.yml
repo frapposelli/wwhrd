@@ -25,8 +25,6 @@ dockers:
     - "frapposelli/wwhrd:v{{ .Major }}"
     goos: linux
     goarch: amd64
-    binaries: 
-    - wwhrd
     dockerfile: Dockerfile
 brews:
   - folder: Formula
@@ -37,8 +35,8 @@ brews:
       name: Fabio Rapposelli
       email: fabio@rapposelli.org
     homepage: "https://github.com/frapposelli/wwhrd/blob/master/README.md"
-    description: "Have Henry Rollins check vendored licenses in your Go project."
+    description: "Have Henry Rollins check vendor licenses in your Go project"
     test: |
       system "#{bin}/wwhrd -v"
     install: |
-      bin.install "program"
+      bin.install "wwhrd"
