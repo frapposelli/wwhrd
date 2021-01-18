@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -27,14 +28,14 @@ type List struct {
 }
 
 type Check struct {
-	File              string  `short:"f" long:"file" description:"input file" default:".wwhrd.yml"`
+	File              string  `short:"f" long:"file" description:"input file, use - for stdin" default:".wwhrd.yml"`
 	NoColor           bool    `long:"no-color" description:"disable colored output"`
 	CoverageThreshold float64 `short:"c" long:"coverage" description:"coverage threshold is the minimum percentage of the file that must contain license text" default:"75"`
 	CheckTestFiles    bool    `short:"t" long:"check-test-files" description:"check imported dependencies for test files"`
 }
 
 type Graph struct {
-	File           string `short:"o" long:"output" description:"output file" default:"wwhrd-graph.dot"`
+	File           string `short:"o" long:"output" description:"output file, use - for stdout" default:"wwhrd-graph.dot"`
 	CheckTestFiles bool   `short:"t" long:"check-test-files" description:"check imported dependencies for test files"`
 }
 
@@ -152,11 +153,43 @@ func (c *Check) Execute(args []string) error {
 		log.SetFormatter(&log.TextFormatter{ForceColors: true})
 	}
 
-	t, err := ReadConfig(c.File)
+	var config []byte
+
+	if c.File == "-" {
+		mf := bufio.NewReader(os.Stdin)
+		var err error
+		config, err = ioutil.ReadAll(mf)
+		if err != nil {
+			return err
+		}
+	} else {
+		if _, err := os.Stat(c.File); os.IsNotExist(err) {
+			return fmt.Errorf("can't read config file: %s", err)
+		}
+
+		f, err := os.Open(c.File)
+		if err != nil {
+			return err
+		}
+
+		config, err = ioutil.ReadAll(f)
+		if err != nil {
+			return err
+		}
+
+		if err = f.Close(); err != nil {
+			return err
+		}
+
+	}
+
+	t, err := ReadConfig(config)
 	if err != nil {
 		err = fmt.Errorf("can't read config file: %s", err)
 		return err
 	}
+
+	log.Debugf("Loaded config: %+v", t)
 
 	root, err := rootDir()
 	if err != nil {

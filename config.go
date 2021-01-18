@@ -1,8 +1,7 @@
 package main
 
 import (
-	"os"
-
+	"bytes"
 	"gopkg.in/yaml.v2"
 )
 
@@ -12,20 +11,11 @@ type Config struct {
 	Exceptions []string `yaml:"exceptions"`
 }
 
-func ReadConfig(path string) (*Config, error) {
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, err
-	}
-
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
+func ReadConfig(config []byte) (*Config, error) {
 
 	t := Config{}
-	if err = yaml.NewDecoder(f).Decode(&t); err != nil {
+	var err error
+	if err = yaml.NewDecoder(bytes.NewReader(config)).Decode(&t); err != nil {
 		return nil, err
 	}
 
