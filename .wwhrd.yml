@@ -1,8 +1,8 @@
 ---
-blacklist:
+denylist:
   - GPL-2.0
 
-whitelist:
+allowlist:
   - Apache-2.0
   - MIT
   - ISC

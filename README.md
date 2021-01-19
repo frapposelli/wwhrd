@@ -22,14 +22,14 @@ brew install frapposelli/tap/wwhrd
 
 Configuration for `wwhrd` is stored in `.wwhrd.yml` at the root of the repo you want to check.
 
-The format is borrowed from [Anderson](https://github.com/xoebus/anderson) and it's 1:1 compatible (just run `wwhrd check -f .anderson.yml`).
+The format is compatible with [Anderson](https://github.com/xoebus/anderson), just run `wwhrd check -f .anderson.yml`.
 
 ```yaml
 ---
-blacklist:
+denylist:
   - GPL-2.0
 
-whitelist:
+allowlist:
   - Apache-2.0
   - MIT
 

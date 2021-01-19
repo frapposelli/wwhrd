@@ -204,13 +204,13 @@ func (c *Check) Execute(args []string) error {
 
 	// Make a map out of the blacklist
 	blacklist := make(map[string]bool)
-	for _, v := range t.Blacklist {
+	for _, v := range t.Denylist {
 		blacklist[v] = true
 	}
 
 	// Make a map out of the whitelist
 	whitelist := make(map[string]bool)
-	for _, v := range t.Whitelist {
+	for _, v := range t.Allowlist {
 		whitelist[v] = true
 	}
 
