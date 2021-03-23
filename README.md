@@ -38,7 +38,7 @@ exceptions:
   - github.com/pmezard/go-difflib/difflib
 ```
 
-Having a license in the `blacklist` section will fail the check, unless the package is listed under `exceptions`.
+Having a license in the `denylist` section will fail the check, unless the package is listed under `exceptions`.
 
 `exceptions` can also be listed as wildcards:
 
