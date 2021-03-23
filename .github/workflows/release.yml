@@ -1,33 +1,28 @@
 name: release
-
 on:
   push:
-    branches-ignore:
-      - '**'
     tags:
-      - 'v*.*.*'
+      - '*'
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout entire git history
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
         with:
           fetch-depth: 0
-      - name: Fetch all tags
-        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - name: Set up Go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v2
         with:
-          go-version: 1.15.x
+          go-version: '1.16'
       - name: Registry login
         run: docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD} docker.io
         env:
           DOCKER_USERNAME: frapposelli
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v1
+        uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
           args: release --rm-dist
