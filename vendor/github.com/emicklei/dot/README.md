@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/emicklei/proto.png)](https://travis-ci.org/emicklei/dot)
 [![Go Report Card](https://goreportcard.com/badge/github.com/emicklei/dot)](https://goreportcard.com/report/github.com/emicklei/dot)
-[![GoDoc](https://godoc.org/github.com/emicklei/dot?status.svg)](https://pkg.go.dev/github.com/emicklei/dot)
+[![GoDoc](https://pkg.go.dev/badge/github.com/emicklei/dot)](https://pkg.go.dev/github.com/emicklei/dot)
 
 [DOT language](http://www.graphviz.org/doc/info/lang.html)
 
@@ -46,6 +46,28 @@ Subgraphs
 	s := g.Subgraph("cluster")
 	s.Attr("style","filled")
 
+
+Initializers
+
+	g := dot.NewGraph(dot.Directed)
+	g.NodeInitializer(func(n dot.Node) {
+		n.Attr("shape", "rectangle")
+		n.Attr("fontname", "arial")
+		n.Attr("style", "rounded,filled")
+	})
+
+	g.EdgeInitializer(func(e dot.Edge) {
+		e.Attr("fontname", "arial")
+		e.Attr("fontsize", "9")
+		e.Attr("arrowsize", "0.8")
+		e.Attr("arrowhead", "open")
+	})
+
+HTML and Literal values
+
+	node.Attr("label", Literal(`"left-justified text\l"`))
+	graph.Attr("label", HTML("<B>Hi</B>"))
+
 ## cluster example
 
 ![](./doc/cluster.png)
@@ -74,4 +96,4 @@ https://graphviz.gitlab.io/_pages/doc/info/attrs.html
 
 	go run main.go | dot -Tpng  > test.png && open test.png
 
-(c) 2015-2020, http://ernestmicklei.com. MIT License
+(c) 2015-2021, http://ernestmicklei.com. MIT License.
