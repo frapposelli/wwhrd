@@ -25,6 +25,7 @@ type List struct {
 	NoColor           bool    `long:"no-color" description:"disable colored output"`
 	CoverageThreshold float64 `short:"c" long:"coverage" description:"coverage threshold is the minimum percentage of the file that must contain license text" default:"75"`
 	CheckTestFiles    bool    `short:"t" long:"check-test-files" description:"check imported dependencies for test files"`
+	ExperimentalModCheck bool `long:"experimental-mod-check" description:"inspect packages in go mod cache instead of vendor folder"`
 }
 
 type Check struct {
@@ -32,6 +33,7 @@ type Check struct {
 	NoColor           bool    `long:"no-color" description:"disable colored output"`
 	CoverageThreshold float64 `short:"c" long:"coverage" description:"coverage threshold is the minimum percentage of the file that must contain license text" default:"75"`
 	CheckTestFiles    bool    `short:"t" long:"check-test-files" description:"check imported dependencies for test files"`
+	ExperimentalModCheck bool `long:"experimental-mod-check" description:"inspect packages in go mod cache instead of vendor folder"`
 }
 
 type Graph struct {
@@ -128,11 +130,19 @@ func (l *List) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-
-	pkgs, err := WalkImports(root, l.CheckTestFiles)
-	if err != nil {
-		return err
+	var pkgs map[string]bool
+	if l.ExperimentalModCheck {
+		pkgs, err = WalkImportsFromModCache(root, l.CheckTestFiles)
+		if err != nil {
+			return err
+		}
+	} else {
+		pkgs, err = WalkImports(root, l.CheckTestFiles)
+		if err != nil {
+			return err
+		}
 	}
+
 	lics := GetLicenses(root, pkgs, l.CoverageThreshold)
 
 	for k, v := range lics {
@@ -243,7 +253,7 @@ PackageList:
 			for wc := range exceptionsWildcard {
 				if strings.HasPrefix(pkg, wc) {
 					// we have a match
-					contextLogger.Warn("Found exceptioned package")
+					contextLogger.Warn("Found exception package")
 					continue PackageList
 				}
 			}
@@ -251,7 +261,7 @@ PackageList:
 
 		// match single-package exceptions
 		if _, exists := exceptions[pkg]; exists {
-			contextLogger.Warn("Found exceptioned package")
+			contextLogger.Warn("Found exception package")
 			continue PackageList
 		}
 

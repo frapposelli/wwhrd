@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -245,6 +246,69 @@ func (g *dependencies) WalkNode(n *node) {
 
 }
 
+func (g *dependencies) WalkNodeFromModCache(n *node) {
+	var walkFn = func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		log.Debugf("walking %q", path)
+
+		// check if we need to skip this
+		if ok, err := shouldSkip(path, info, g.checkTest); ok {
+			return err
+		}
+
+		fs := token.NewFileSet()
+		f, err := parser.ParseFile(fs, path, nil, parser.ImportsOnly)
+		if err != nil {
+			return err
+		}
+
+		for _, s := range f.Imports {
+			vendorpkg := strings.Replace(s.Path.Value, "\"", "", -1)
+			log.Debugf("found import %q", vendorpkg)
+
+			args := []string{"list", "-mod=mod", "-f", `'{{.Dir}}'`, "-m", vendorpkg}
+			cmd := exec.Command("go", args...)
+			log.Debugf("checking import with go command: %q", cmd)
+			cmd.Env = append(os.Environ(),
+				"PATH=/usr/local/Cellar/go/1.16.3/libexec/bin",
+			)
+			out, err := cmd.Output()
+			if err != nil {
+				log.Debugf("error returned: %q", err)
+				//return err
+			}
+			pkgdir := strings.TrimSuffix(string(out), "\n")
+			pkgdir = strings.Trim(pkgdir, "'")
+			log.Debugf("import check result: %q", pkgdir)
+
+			if _, err := os.Stat(pkgdir); !os.IsNotExist(err) {
+
+				// Add imported pkg to the graph
+				var vendornode = node{pkg: vendorpkg, dir: pkgdir, vendor: n.vendor}
+				log.Debugf("[%s] adding node", vendornode.pkg)
+				if err := g.addNode(&vendornode); err != nil {
+					log.Debug(err.Error())
+					continue
+				}
+				log.Debugf("[%s] adding node as edge of %s", vendornode.pkg, n.pkg)
+				g.addEdge(n, &vendornode)
+				log.Debugf("[%s] walking node", vendornode.pkg)
+				g.WalkNode(&vendornode)
+			}
+
+		}
+		return nil
+	}
+
+	if err := filepath.Walk(n.dir, walkFn); err != nil {
+		return
+	}
+
+}
+
 func WalkImports(root string, checkTest bool) (map[string]bool, error) {
 
 	graph := newGraph(checkTest)
@@ -255,6 +319,20 @@ func WalkImports(root string, checkTest bool) (map[string]bool, error) {
 
 	log.Debugf("[%s] walking root node", rootNode.pkg)
 	graph.WalkNode(&rootNode)
+
+	return graph.nodesList, nil
+}
+
+func WalkImportsFromModCache(root string, checkTest bool) (map[string]bool, error) {
+
+	graph := newGraph(checkTest)
+	rootNode := node{pkg: "root", dir: root, vendor: root}
+	if err := graph.addNode(&rootNode); err != nil {
+		log.Debug(err.Error())
+	}
+
+	log.Debugf("[%s] walking root node", rootNode.pkg)
+	graph.WalkNodeFromModCache(&rootNode)
 
 	return graph.nodesList, nil
 }
@@ -282,9 +360,9 @@ func GetLicenses(root string, list map[string]bool, threshold float64) map[strin
 
 	var lics = make(map[string]string)
 
-	if !strings.HasSuffix(root, "vendor") {
-		root = filepath.Join(root, "vendor")
-	}
+	//if !strings.HasSuffix(root, "vendor") {
+	//	root = filepath.Join(root, "vendor")
+	//}
 	log.Debug("Start walking paths for LICENSE discovery")
 	for k := range list {
 
