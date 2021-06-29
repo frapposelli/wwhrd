@@ -130,7 +130,7 @@ func (l *List) Execute(args []string) error {
 	if err != nil {
 		return err
 	}
-	var pkgs map[string]bool
+	var pkgs *dependencies
 	if l.ExperimentalModCheck {
 		pkgs, err = WalkImportsFromModCache(root, l.CheckTestFiles)
 		if err != nil {

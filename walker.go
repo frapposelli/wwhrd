@@ -309,7 +309,7 @@ func (g *dependencies) WalkNodeFromModCache(n *node) {
 
 }
 
-func WalkImports(root string, checkTest bool) (map[string]bool, error) {
+func WalkImports(root string, checkTest bool) (*dependencies, error) {
 
 	graph := newGraph(checkTest)
 	rootNode := node{pkg: "root", dir: root, vendor: root}
@@ -320,10 +320,10 @@ func WalkImports(root string, checkTest bool) (map[string]bool, error) {
 	log.Debugf("[%s] walking root node", rootNode.pkg)
 	graph.WalkNode(&rootNode)
 
-	return graph.nodesList, nil
+	return graph, nil
 }
 
-func WalkImportsFromModCache(root string, checkTest bool) (map[string]bool, error) {
+func WalkImportsFromModCache(root string, checkTest bool) (*dependencies, error) {
 
 	graph := newGraph(checkTest)
 	rootNode := node{pkg: "root", dir: root, vendor: root}
@@ -334,7 +334,7 @@ func WalkImportsFromModCache(root string, checkTest bool) (map[string]bool, erro
 	log.Debugf("[%s] walking root node", rootNode.pkg)
 	graph.WalkNodeFromModCache(&rootNode)
 
-	return graph.nodesList, nil
+	return graph, nil
 }
 
 func GraphImports(root string, checkTest bool) (string, error) {
@@ -351,7 +351,7 @@ func GraphImports(root string, checkTest bool) (string, error) {
 	return graph.getDotGraph(), nil
 }
 
-func GetLicenses(root string, list map[string]bool, threshold float64) map[string]string {
+func GetLicenses(root string, list *dependencies, threshold float64) map[string]string {
 
 	checker, err := licensecheck.NewScanner(licensecheck.BuiltinLicenses())
 	if err != nil {
@@ -364,25 +364,70 @@ func GetLicenses(root string, list map[string]bool, threshold float64) map[strin
 	//	root = filepath.Join(root, "vendor")
 	//}
 	log.Debug("Start walking paths for LICENSE discovery")
-	for k := range list {
 
-		var fpath = filepath.Join(root, k)
-		pkg, err := os.Stat(fpath)
+	list.RLock()
+	q := nodeQueue{}
+	q.new()
+	n := list.nodes[0]
+	q.enqueue(*n)
+	visited := make(map[*node]bool)
 
+	for {
+		if q.isEmpty() {
+			break
+		}
+		node := q.dequeue()
+		// add dotGraph node after dequeing
+		//dGN := list.dotGraph.Node(node.pkg)
+
+		pkg, err := os.Stat(node.dir)
 		if err != nil {
 			continue
 		}
 		if pkg.IsDir() {
-			log.Debugf("Walking path: %s", fpath)
+			log.Debugf("Walking path: %s", node.dir)
 
-			waa := scanDir(checker, fpath, threshold)
+			waa := scanDir(checker, node.dir, threshold)
 			if waa != "" {
-				lics[k] = waa
+				lics[node.pkg] = waa
 			}
-
 		}
 
+		visited[node] = true
+		near := list.edges[*node]
+
+		for i := 0; i < len(near); i++ {
+			j := near[i]
+			if !visited[j] {
+				q.enqueue(*j)
+				visited[j] = true
+			}
+		}
+		//if f != nil {
+		//	f(node)
+		//}
 	}
+	list.RUnlock()
+
+	//for k := range list {
+	//
+	//	var fpath = filepath.Join(root, k)
+	//	pkg, err := os.Stat(fpath)
+	//
+	//	if err != nil {
+	//		continue
+	//	}
+	//	if pkg.IsDir() {
+	//		log.Debugf("Walking path: %s", fpath)
+	//
+	//		waa := scanDir(checker, fpath, threshold)
+	//		if waa != "" {
+	//			lics[k] = waa
+	//		}
+	//
+	//	}
+	//
+	//}
 
 	return lics
 }
