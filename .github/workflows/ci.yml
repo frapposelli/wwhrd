@@ -20,7 +20,7 @@ jobs:
       with:
         go-version: ${{ matrix.go_version }}
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v2.3.4
+      uses: actions/checkout@v2.4.0
     - name: run coverage
       run: |
         bash hack/coverage
