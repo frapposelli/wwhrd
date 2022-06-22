@@ -1,6 +1,6 @@
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
-# github.com/emicklei/dot v0.16.0
+# github.com/emicklei/dot v1.0.0
 ## explicit
 github.com/emicklei/dot
 # github.com/google/licensecheck v0.3.1

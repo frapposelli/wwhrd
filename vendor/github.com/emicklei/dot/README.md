@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/emicklei/proto.png)](https://travis-ci.org/emicklei/dot)
 [![Go Report Card](https://goreportcard.com/badge/github.com/emicklei/dot)](https://goreportcard.com/report/github.com/emicklei/dot)
 [![GoDoc](https://pkg.go.dev/badge/github.com/emicklei/dot)](https://pkg.go.dev/github.com/emicklei/dot)
+[![codecov](https://codecov.io/gh/emicklei/dot/branch/master/graph/badge.svg)](https://codecov.io/gh/emicklei/dot)
 
 [DOT language](http://www.graphviz.org/doc/info/lang.html)
 
@@ -90,10 +91,10 @@ HTML and Literal values
 
 ## About dot attributes
 
-https://graphviz.gitlab.io/_pages/doc/info/attrs.html
+https://graphviz.gitlab.io/doc/info/attrs.html
 
 ## display your graph
 
 	go run main.go | dot -Tpng  > test.png && open test.png
 
-(c) 2015-2021, http://ernestmicklei.com. MIT License.
+(c) 2015-2022, http://ernestmicklei.com. MIT License.
