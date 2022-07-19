@@ -16,14 +16,13 @@ github.com/jessevdk/go-flags
 ## explicit
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
-# github.com/sirupsen/logrus v1.8.1
+# github.com/sirupsen/logrus v1.9.0
 ## explicit
 github.com/sirupsen/logrus
 # github.com/stretchr/testify v1.8.0
 ## explicit
 github.com/stretchr/testify/assert
-# golang.org/x/sys v0.0.0-20210330210617-4fbd30eecc44
-## explicit
+# golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
