@@ -53,3 +53,9 @@ func (n Node) BidirectionalEdge(toAndFromNode Node) []Edge {
 	e2 := toAndFromNode.Edge(n).Attr("dir", "both")
 	return []Edge{e1, e2}
 }
+
+// NewRecordBuilder returns a new recordBuilder for setting the attributes for a record-shaped node.
+// Call Build() on the builder to set the label and shape.
+func (n Node) NewRecordBuilder() *recordBuilder {
+	return newRecordBuilder(n)
+}
