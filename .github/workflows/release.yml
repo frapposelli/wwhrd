@@ -22,7 +22,7 @@ jobs:
           DOCKER_USERNAME: frapposelli
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4.3.0
+        uses: goreleaser/goreleaser-action@v4.4.0
         with:
           version: latest
           args: release --rm-dist
