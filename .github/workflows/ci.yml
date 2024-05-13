@@ -32,8 +32,6 @@ jobs:
       uses: codecov/codecov-action@v3
       if: matrix.go_version == '1.22' && matrix.os == 'ubuntu-latest'
       with:
-        token: ${{ secrets.CODECOV_KEY }}
+        token: ${{ secrets.CODECOV_TOKEN }}
         file: ./.cover/cover.out
         fail_ci_if_error: true
-
-
