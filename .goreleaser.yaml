@@ -1,14 +1,23 @@
----
-project_name: wwhrd
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
 builds:
-- goos:
-  - linux
-  - darwin
-  - windows
-  goarch:
-  - amd64
-  env:
-  - CGO_ENABLED=0
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+  
 archives:
   - id: github
     name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
@@ -27,8 +36,8 @@ dockers:
     goarch: amd64
     dockerfile: Dockerfile
 brews:
-  - folder: Formula
-    tap:
+  - directory: Formula
+    repository:
       owner: frapposelli
       name: homebrew-tap
     commit_author:
