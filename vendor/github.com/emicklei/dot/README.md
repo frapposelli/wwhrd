@@ -1,5 +1,6 @@
 ## dot - little helper package in Go for the graphviz dot language
 
+[![Go](https://github.com/emicklei/dot/actions/workflows/go.yml/badge.svg)](https://github.com/emicklei/dot/actions/workflows/go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/emicklei/dot)](https://goreportcard.com/report/github.com/emicklei/dot)
 [![GoDoc](https://pkg.go.dev/badge/github.com/emicklei/dot)](https://pkg.go.dev/github.com/emicklei/dot)
 [![codecov](https://codecov.io/gh/emicklei/dot/branch/master/graph/badge.svg)](https://codecov.io/gh/emicklei/dot)
@@ -117,6 +118,20 @@ g := dot.NewGraph(dot.Directed)
 ...
 fmt.Println(dot.MermaidGraph(g, dot.MermaidTopToBottom))
 ```
+
+### subgraphs in mermaid
+
+```mermaid
+flowchart LR;n8-->n3;subgraph one;n2("a1");n3("a2");n2-->n3;end;subgraph three;n8("c1");n9("c2");n8-->n9;end;subgraph two;n5("b1");n6("b2");n5-->n6;end;
+```
+
+### mermaid specific attributes
+
+|attr|type|description|
+|----|----|-----------|
+|link|Edge|examples are {-->,-.->,--x,o--o}|
+|shape|Node|examples are {MermaidShapeRound,MermaidShapeCircle,MermaidShapeTrapezoid}
+|style|Node|example is fill:#90EE90|
 
 ## extensions
 
