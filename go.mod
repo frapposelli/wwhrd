@@ -3,7 +3,7 @@ module github.com/frapposelli/wwhrd
 go 1.22
 
 require (
-	github.com/emicklei/dot v1.8.0
+	github.com/emicklei/dot v1.9.0
 	github.com/google/licensecheck v0.3.1
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/sirupsen/logrus v1.9.3
